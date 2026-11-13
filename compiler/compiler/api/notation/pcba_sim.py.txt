@@ -1,0 +1,343 @@
+"""Bounded scalar activation simulation for explicitly bound, fixed-bias CJTs.
+
+The preserved CCDL checker owns syntax, named-net identity and static checks.
+This new execution profile instantiates the scalar example in PCBA Engineer,
+Chapter 4, lines 135-141. It is not the general CAS/Fisher-Rao transition law.
+Bias is held constant; below cutoff the idealized output is zero, otherwise
+the zero-origin scalar response is min(sat, beta*cause). Exact cutoff equality
+conducts and exact saturation equality is saturated. Those boundary and
+zero-origin choices, DAG scheduling and logical ticks are explicit conventions
+of this profile, not recovered historical runtime behavior.
+
+No neural inference, network, credentials, subprocesses or wall-clock simulation are used.
+The checker reads its bundled source files for provenance. The caller controls
+a finite schedule. Unsupported behavior rejects
+the entire request; no guessed transfer, input binding or cycle delay is used.
+"""
+from __future__ import annotations
+
+from copy import deepcopy
+from fractions import Fraction
+import hashlib
+import json
+from pathlib import Path
+import re
+from typing import Any
+
+from .pcba_check import check_pcba_document
+
+
+PROFILE = "cas.pcba.scalar-fixed-bias/0.1"
+OHM_PROFILE = "cas.pcba.ohm-resistor/0.1"
+SCHEMA = "cas.pcba.simulation/0.1"
+MAX_STEPS = 256
+MAX_NODES = 128
+MAX_COMPONENTS = 64
+MAX_COMPONENT_EVALUATIONS = 8192
+MAX_NUMBER_CHARS = 512
+MAX_VALUE_BITS = 4096
+MAX_TRACE_BYTES = 4 * 1024 * 1024
+MAX_LOGICAL_TICK = 1_000_000
+_DECIMAL = re.compile(r"(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)\Z")
+_INTEGER = re.compile(r"(?:0|[1-9][0-9]*)\Z")
+SOURCES = [
+    {"path": "book/CAS_PCBA_Engineer/Chapter_04_Your_First_Cognitive_Circuit.md",
+     "sha256": "9515e9491deb8e47c41ce0c577d9cd4b3587b7ee3e6d185e36e17385dd1847f9",
+     "lines": [135, 141], "use": "scalar gain, bias cutoff and effect saturation example"},
+    {"path": "book/CAS_PCBA_Engineer/Appendix_I_CAS_Ohm_Measurement_and_Calibration.md",
+     "sha256": "5be5667eb9b37460a7b7c2f9c21ca664582445f54136c0cb0a87cec6dd98de60",
+     "lines": [25, 29], "use": "activation, saturation and cutoff use [0,1]"},
+]
+
+
+class SimulationError(ValueError):
+    def __init__(self, code: str, message: str):
+        self.code, self.message = code, message
+        super().__init__(message)
+
+
+def _reject(code: str, message: str) -> None:
+    raise SimulationError(code, message)
+
+
+def _json(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False)
+
+
+def _digest(value: Any) -> str:
+    return hashlib.sha256(_json(value).encode("utf-8")).hexdigest()
+
+
+def _record(value: Fraction) -> dict[str, str]:
+    return {"numerator": str(value.numerator), "denominator": str(value.denominator)}
+
+
+def _bounded(value: Fraction, label: str) -> Fraction:
+    if max(value.numerator.bit_length(), value.denominator.bit_length()) > MAX_VALUE_BITS:
+        _reject("SIM_NUMBER_LIMIT", f"{label} exceeds the {MAX_VALUE_BITS}-bit exact arithmetic budget")
+    return value
+
+
+def _number(value: Any, label: str, *, exact: bool = False, activation: bool = True) -> Fraction:
+    if type(value) is str and len(value) <= MAX_NUMBER_CHARS and _DECIMAL.fullmatch(value):
+        result = Fraction(value)
+    elif exact and type(value) is dict and set(value) == {"numerator", "denominator"}:
+        # 1234 decimal digits cover the 4096-bit budget; reject before int conversion.
+        for part in (value["numerator"], value["denominator"]):
+            if type(part) is not str or len(part) > 1234 or not _INTEGER.fullmatch(part):
+                _reject("SIM_NUMBER", f"{label} requires canonical nonnegative exact integers")
+        numerator, denominator = int(value["numerator"]), int(value["denominator"])
+        if denominator == 0:
+            _reject("SIM_NUMBER", f"{label} denominator must be positive")
+        result = Fraction(numerator, denominator)
+        if _record(result) != value:
+            _reject("SIM_NUMBER", f"{label} exact fraction must be reduced")
+    else:
+        _reject("SIM_NUMBER", f"{label} requires finite nonnegative decimal text" +
+                (" or a reduced exact fraction" if exact else ""))
+    _bounded(result, label)
+    if activation and not 0 <= result <= 1:
+        _reject("SIM_ACTIVATION_RANGE", f"{label} must be in [0,1]")
+    return result
+
+
+def _mapping(value: Any, label: str, keys: set[str] | None = None) -> dict:
+    if type(value) is not dict:
+        _reject("SIM_REQUEST", f"{label} must be an object")
+    if any(type(key) is not str for key in value):
+        _reject("SIM_REQUEST", f"{label} keys must be strings")
+    if keys is not None and set(value) != keys:
+        _reject("SIM_REQUEST", f"{label} requires exactly these keys: {', '.join(sorted(keys))}")
+    return value
+
+
+def _state(nodes: dict[str, Fraction], tick: int, source_sha256: str,
+           bindings_sha256: str, runtime_sha256: str) -> dict:
+    return {"profile": PROFILE, "source_sha256": source_sha256,
+            "bindings_sha256": bindings_sha256, "runtime_sha256": runtime_sha256, "tick": tick,
+            "nodes": {name: _record(value) for name, value in sorted(nodes.items())}}
+
+
+def _prepare(source: str, inputs: Any, steps: Any) -> dict:
+    if type(steps) is not int or not 1 <= steps <= MAX_STEPS:
+        _reject("SIM_STEP_LIMIT", f"steps must be an integer in [1,{MAX_STEPS}]")
+    request = _mapping(inputs, "simulation request", {
+        "profile", "input_bindings", "output_bindings", "initial_state", "schedule"})
+    if request["profile"] != PROFILE:
+        _reject("SIM_PROFILE", f"Explicit profile {PROFILE!r} is required")
+    if type(source) is not str:
+        _reject("SIM_SOURCE", "CCDL source must be text")
+    try:
+        checked = check_pcba_document(source)
+    except OSError:
+        _reject("SIM_SOURCE_RECEIPT", "Cannot read bundled checker dependency bytes for provenance")
+    if checked.get("valid") is not True or checked.get("structural_status") != "PASS":
+        _reject("SIM_STATIC_CHECK", "The preserved CCDL checker did not pass this source")
+    document = checked["document"]
+    allowed = {"input", "output", "node", "component", "probe"}
+    for statement in document["statements"]:
+        if statement["kind"] not in allowed:
+            _reject("SIM_UNSUPPORTED_STATEMENT", f"No execution rule for {statement['kind']!r}")
+    netlist = checked["netlist"]
+    symbols = netlist["symbols"]
+    nodes = {name for name, symbol in symbols.items() if symbol["kind"] == "node"}
+    components = netlist["components"]
+    declared_inputs = {name for name, symbol in symbols.items() if symbol["kind"] == "input"}
+    declared_outputs = {name for name, symbol in symbols.items() if symbol["kind"] == "output"}
+    if not nodes or len(nodes) > MAX_NODES or not components or len(components) > MAX_COMPONENTS:
+        _reject("SIM_GRAPH_LIMIT", f"Require 1..{MAX_NODES} nodes and 1..{MAX_COMPONENTS} CJTs")
+    if not declared_inputs or not declared_outputs:
+        _reject("SIM_IO", "Declare at least one external input and output")
+    if len(components) * steps > MAX_COMPONENT_EVALUATIONS:
+        _reject("SIM_WORK_LIMIT", f"Request exceeds {MAX_COMPONENT_EVALUATIONS} component evaluations")
+    inbound = _mapping(request["input_bindings"], "input_bindings", declared_inputs)
+    outbound = _mapping(request["output_bindings"], "output_bindings", declared_outputs)
+    for label, bindings in (("input_bindings", inbound), ("output_bindings", outbound)):
+        for name, target in bindings.items():
+            if type(target) is not str or target not in nodes:
+                _reject("SIM_BINDING", f"{label}.{name} must reference a declared typed node")
+    if len(set(inbound.values())) != len(inbound):
+        _reject("SIM_MULTIPLE_DRIVERS", "Two external inputs cannot drive the same node")
+    source_sha256 = document["source_sha256"]
+    bindings_sha256 = _digest({"input_bindings": inbound, "output_bindings": outbound})
+    implementation = dict(checked["sources"]["implementation_sha256_lf"])
+    try:
+        implementation["pcba_sim.py"] = hashlib.sha256(
+            Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+    except OSError:
+        _reject("SIM_SOURCE_RECEIPT", "Cannot read simulator implementation bytes for provenance")
+    runtime_sha256 = _digest({"profile": PROFILE, "implementation_sha256_lf": implementation})
+    initial = _mapping(request["initial_state"], "initial_state")
+    required_state_keys = {"tick", "nodes"}
+    metadata = {"profile": PROFILE, "source_sha256": source_sha256,
+                "bindings_sha256": bindings_sha256, "runtime_sha256": runtime_sha256}
+    if not required_state_keys <= set(initial) or set(initial) - required_state_keys - set(metadata):
+        _reject("SIM_INITIAL_STATE", "initial_state requires tick and nodes, with only profile/source/bindings/runtime metadata")
+    tick = initial["tick"]
+    if type(tick) is not int or not 0 <= tick <= MAX_LOGICAL_TICK - steps:
+        _reject("SIM_INITIAL_STATE", "Initial tick is invalid or exceeds the logical tick budget")
+    for key, expected in metadata.items():
+        if (tick > 0 and key not in initial) or (key in initial and initial[key] != expected):
+            _reject("SIM_RESTART_BINDING", f"Initial state {key} does not bind this source, runtime, profile and I/O map")
+    initial_nodes = _mapping(initial["nodes"], "initial_state.nodes", nodes)
+    values = {name: _number(value, "initial_state.nodes." + name, exact=True)
+              for name, value in initial_nodes.items()}
+    schedule = request["schedule"]
+    if type(schedule) is not list or len(schedule) != steps:
+        _reject("SIM_SCHEDULE", "schedule must contain exactly one input object per requested step")
+    normalized_schedule = []
+    for index, row in enumerate(schedule):
+        _mapping(row, f"schedule[{index}]", declared_inputs)
+        normalized_schedule.append({name: _number(value, f"schedule[{index}].{name}")
+                                    for name, value in row.items()})
+    prepared = {}
+    drivers = {node: "input:" + name for name, node in inbound.items()}
+    used_nodes = set(inbound.values()) | set(outbound.values())
+    bias_nodes = set()
+    for name, component in sorted(components.items()):
+        if component["type"] != "CJT":
+            _reject("SIM_UNSUPPORTED_COMPONENT", f"No numeric transfer rule for {component['type']!r}")
+        params = component["parameter_literals"]
+        if set(params) - {"beta", "sat", "cutoff", "region"}:
+            _reject("SIM_UNSUPPORTED_PARAMETER", f"CJT {name} requests dynamic bias or an unsupported parameter")
+        if params.get("region") != "active":
+            _reject("SIM_UNSUPPORTED_PARAMETER", f"CJT {name}: only intended region=active is supported; actual regions are computed")
+        terminals = {}
+        for role in ("cause", "bias", "effect"):
+            terminal = component["resolved_terminals"].get(role)
+            if (not terminal or terminal["reference"] not in nodes or
+                    terminal["id"] != "name:" + terminal["reference"]):
+                _reject("SIM_UNBOUND_TERMINAL", f"CJT {name}.{role} requires one declared named node")
+            terminals[role] = terminal["reference"]
+        cause, bias, effect = (terminals[role] for role in ("cause", "bias", "effect"))
+        if effect in drivers:
+            _reject("SIM_MULTIPLE_DRIVERS", f"Node {effect!r} has multiple drivers")
+        drivers[effect] = name
+        bias_nodes.add(bias)
+        used_nodes.update(terminals.values())
+        prepared[name] = {**terminals,
+                          "beta": _number(params["beta"], f"{name}.beta", activation=False),
+                          "sat": _number(params["sat"], f"{name}.sat"),
+                          "cutoff": _number(params["cutoff"], f"{name}.cutoff")}
+    if bias_nodes & set(drivers):
+        _reject("SIM_DYNAMIC_BIAS", "Every bias must be an undriven node retained from explicit initial state")
+    cause_nodes = {component["cause"] for component in prepared.values()}
+    if set(inbound.values()) - cause_nodes:
+        _reject("SIM_UNUSED_INPUT", "Every external input must drive at least one CJT cause")
+    for name, component in prepared.items():
+        if component["cause"] not in drivers:
+            _reject("SIM_UNDRIVEN_CAUSE", f"CJT {name}.cause has no external input or component driver")
+    for name, node in outbound.items():
+        if node not in drivers or drivers[node].startswith("input:"):
+            _reject("SIM_OUTPUT", f"Output {name!r} must observe a CJT-driven node")
+    probes = {}
+    for probe in netlist["probes"]:
+        terminal = probe["target"]
+        if (not terminal or terminal["reference"] not in nodes or
+                terminal["id"] != "name:" + terminal["reference"]):
+            _reject("SIM_UNBOUND_PROBE", f"Probe {probe['name']} requires a declared named node")
+        probes[probe["name"]] = terminal["reference"]
+    if used_nodes != nodes:
+        _reject("SIM_UNUSED_NODE", "All declared nodes must participate in the executable board")
+    # A lexical topological order is invariant to source declaration order.
+    pending = set(prepared)
+    ready_nodes = set(inbound.values())
+    order = []
+    while pending:
+        available = sorted(name for name in pending if prepared[name]["cause"] in ready_nodes)
+        if not available:
+            _reject("SIM_CYCLE", "CJT cause/effect graph has a cycle; this profile provides no implicit delay")
+        for name in available:
+            order.append(name)
+            ready_nodes.add(prepared[name]["effect"])
+            pending.remove(name)
+    return {"source_sha256": source_sha256, "bindings_sha256": bindings_sha256,
+            "runtime_sha256": runtime_sha256, "implementation_sha256_lf": implementation,
+            "nodes": values, "tick": tick, "input_bindings": dict(inbound),
+            "output_bindings": dict(outbound), "schedule": normalized_schedule,
+            "components": prepared, "order": order, "probes": probes}
+
+
+def simulate_pcba(source: str, *, inputs: dict, steps: int) -> dict:
+    """Execute one bounded request atomically, returning JSON-safe observations.
+
+    Initial node activations are all explicit. Each tick snapshots prior state,
+    applies that tick's external inputs, settles the acyclic graph in the
+    reported order, retains fixed bias and records output/probe observations.
+    A returned final_state may seed a later call with the same source/profile/
+    bindings/runtime receipt. This is a data snapshot, not a signed or authorized resume token.
+    Rejections expose no committed partial trace or final state.
+    """
+    if type(inputs) is dict and inputs.get("profile") == OHM_PROFILE:
+        # Separate dimensional contract; attention flow is never silently
+        # converted into a scalar CJT activation or supplied to this scheduler.
+        from .pcba_ohm_sim import simulate_ohm_profile
+        return simulate_ohm_profile(source, inputs=inputs, steps=steps)
+    result = {"schema": SCHEMA, "profile": PROFILE, "valid": False,
+              "execution_status": "REJECTED", "error": None, "diagnostics": [],
+              "steps_requested": steps if type(steps) is int and -MAX_STEPS <= steps <= MAX_STEPS else None,
+              "steps_completed": 0, "source_sha256": None, "trace": [],
+              "initial_state": None, "final_state": None, "outputs": None,
+              "update_order": [], "sources": deepcopy(SOURCES),
+              "arithmetic": "EXACT_NONNEGATIVE_RATIONAL",
+              "scope": "DESIGN_APPROXIMATION: declared scalar fixed-bias CJT activations; not measured cognition or Fisher-Rao gain",
+              "limits": {"steps": MAX_STEPS, "nodes": MAX_NODES,
+                         "components": MAX_COMPONENTS, "component_evaluations": MAX_COMPONENT_EVALUATIONS,
+                         "value_bits": MAX_VALUE_BITS, "trace_bytes": MAX_TRACE_BYTES},
+              "conventions": {"transfer": "0 if bias < cutoff else min(sat, beta*cause)",
+                              "cutoff_equality": "conducts", "saturation_equality": "saturation",
+                              "bias": "constant from initial state", "time": "logical ticks, no physical duration",
+                              "zero_origin": "idealized scalar activation; no intercept",
+                              "idealized_cutoff": "exact zero below cutoff; the source describes approximately zero",
+                              "scheduling": "input assignment then deterministic topological settling per tick"}}
+    try:
+        plan = _prepare(source, inputs, steps)
+        values, tick = plan["nodes"].copy(), plan["tick"]
+        source_hash, binding_hash = plan["source_sha256"], plan["bindings_sha256"]
+        runtime_hash = plan["runtime_sha256"]
+        initial_state = _state(values, tick, source_hash, binding_hash, runtime_hash)
+        trace, trace_bytes = [], 0
+        outputs = None
+        for row in plan["schedule"]:
+            before = _state(values, tick, source_hash, binding_hash, runtime_hash)
+            for external, value in row.items():
+                values[plan["input_bindings"][external]] = value
+            operations = []
+            for name in plan["order"]:
+                component = plan["components"][name]
+                cause, bias = values[component["cause"]], values[component["bias"]]
+                if bias < component["cutoff"]:
+                    output, region = Fraction(0), "cutoff"
+                else:
+                    product = _bounded(component["beta"] * cause, name + " gain product")
+                    output = min(component["sat"], product)
+                    region = "saturation" if product >= component["sat"] else "active"
+                values[component["effect"]] = output
+                operations.append({"component": name, "cause": component["cause"],
+                                   "bias": component["bias"], "effect": component["effect"],
+                                   "cause_value": _record(cause), "bias_value": _record(bias),
+                                   "beta": _record(component["beta"]), "sat": _record(component["sat"]),
+                                   "cutoff": _record(component["cutoff"]), "region": region,
+                                   "output": _record(output)})
+            tick += 1
+            after = _state(values, tick, source_hash, binding_hash, runtime_hash)
+            outputs = {external: _record(values[node]) for external, node in sorted(plan["output_bindings"].items())}
+            trace_row = {"tick": tick, "inputs": {name: _record(value) for name, value in sorted(row.items())},
+                         "before_state": before, "components": operations, "after_state": after,
+                         "outputs": outputs,
+                         "probes": {name: _record(values[node]) for name, node in sorted(plan["probes"].items())}}
+            trace_bytes += len(_json(trace_row).encode("utf-8")) + 1
+            if trace_bytes > MAX_TRACE_BYTES:
+                _reject("SIM_TRACE_LIMIT", f"Simulation trace exceeds {MAX_TRACE_BYTES} bytes")
+            trace.append(trace_row)
+        result.update({"valid": True, "execution_status": "EXECUTED", "steps_completed": steps,
+                       "source_sha256": source_hash, "bindings_sha256": binding_hash,
+                       "runtime_sha256": runtime_hash, "implementation_sha256_lf": plan["implementation_sha256_lf"],
+                       "provenance_scope": "LF-normalized bundled source bytes read at execution; content receipt, not a signature or loaded-code attestation",
+                       "initial_state": initial_state, "final_state": _state(values, tick, source_hash, binding_hash, runtime_hash),
+                       "trace": trace, "outputs": outputs, "update_order": plan["order"],
+                       "trace_sha256": _digest(trace), "component_evaluations": steps * len(plan["order"])})
+    except SimulationError as error:
+        result["error"] = f"{error.code}: {error.message}"
+        result["diagnostics"] = [{"code": error.code, "severity": "error", "message": error.message}]
+    return result

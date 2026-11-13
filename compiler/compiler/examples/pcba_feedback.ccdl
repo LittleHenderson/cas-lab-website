@@ -1,0 +1,12 @@
+// Exact declared simple-cycle gain: 0.5 * 0.5 = 1/4.
+// This static path calculation is not a dynamical or empirical stability claim.
+circuit bounded_feedback {
+    input: prompt;
+    output: response;
+    node question: ^8^C_{F2}|A;
+    node bias: ^5^C_{F2}|A;
+    node answer: ^9^C_{F6}|A;
+    cjt decision: CJT< question | bias => answer > [beta=0.5, gm=0.1];
+    feedback return_path: answer -> question [beta=0.5];
+    probe tp_answer: answer;
+}

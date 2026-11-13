@@ -1,0 +1,13 @@
+{
+  "evidence_kind": "HAND_CALCULATED_EXPECTATION_NOT_EXECUTED_OUTPUT",
+  "profile": "cas.pcba.ohm-resistor/0.1",
+  "arithmetic": "9/30=3/10; 0/30=0; 1/30 remains exact 1/30",
+  "expected_ticks": [
+    {"tick": 1, "flow": {"numerator": "3", "denominator": "10"}},
+    {"tick": 2, "flow": {"numerator": "0", "denominator": "1"}},
+    {"tick": 3, "flow": {"numerator": "1", "denominator": "30"}}
+  ],
+  "probe_equals_output": "tp_flow",
+  "initial_state": {},
+  "final_state": {}
+}

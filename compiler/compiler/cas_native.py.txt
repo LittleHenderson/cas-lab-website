@@ -1,0 +1,504 @@
+"""Explicit, offline bridge to the casc Rust command-line compiler.
+
+No binary is bundled, located on PATH, downloaded, or executed on import.
+Call configure_native with the absolute path of a trusted, separately built
+binary before calling compile_native or native_grammar. This adapter verifies
+the response contract, not the selected binary's provenance or freshness.
+
+The contract is based on cas-engine/crates/casc-cli/src/main.rs and
+cas-engine/crates/casc-ir/src/lib.rs. The CLI's check mode compiles AND executes
+before filtering its output. Manifest lex/parse also use the full pipeline;
+only expression/file lex/parse stop at the frontend. Rust supplies no diagram.
+"""
+
+from __future__ import annotations
+
+from copy import deepcopy
+import json
+import math
+import os
+from pathlib import Path
+import stat
+import subprocess
+import threading
+import time
+from typing import Any
+
+
+NATIVE_MODES = ("lex", "parse", "check", "run")
+NATIVE_TIMEOUT_SECONDS = 30
+NATIVE_MAX_JSON_DEPTH = 64
+NATIVE_MAX_OUTPUT_BYTES = 2 * 1024 * 1024
+_CLI_OPTIONS = frozenset(
+    ("--mode", "--file", "--manifest", "--grammar", "--logo", "--repl")
+)
+_native_binary: Path | None = None
+_NO_DIAGRAM = "The Rust casc CLI does not provide diagram data or SVG/HTML exports."
+
+
+class NativeBackendError(RuntimeError):
+    """The explicit native backend could not provide the requested response."""
+
+
+class NativeCaptureError(NativeBackendError):
+    """Native output exceeded the budget or could not be captured completely."""
+
+    def __init__(self, message: str, stdout: bytes, stderr: bytes):
+        super().__init__(message)
+        self.stdout = stdout
+        self.stderr = stderr
+
+
+class NativeArtifact:
+    """Terminal-compatible view without converting the Rust result schema.
+
+    to_dict retains every accepted backend field and adds only _native metadata.
+    A protocol failure has its own invalid artifact and retains the rejected
+    backend object under _native.raw_payload. Thus an inconsistent valid=true
+    response is never presented as a successful compile.
+    """
+
+    engine = "casc-native"
+
+    def __init__(self, payload: dict[str, Any], metadata: dict[str, Any]):
+        self._payload = deepcopy(payload)
+        self._metadata = deepcopy(metadata)
+
+    @property
+    def valid(self) -> bool:
+        return self._payload.get("valid") is True
+
+    @property
+    def error(self) -> str | None:
+        return self._payload.get("error")
+
+    @property
+    def tokens(self) -> list[Any]:
+        return deepcopy(self._payload.get("tokens", []))
+
+    @property
+    def bytecode(self) -> list[Any]:
+        return deepcopy(self._payload.get("bytecode", []))
+
+    def to_dict(self) -> dict[str, Any]:
+        data = deepcopy(self._payload)
+        data["_native"] = deepcopy(self._metadata)
+        return data
+
+    def diagram(self) -> dict[str, Any]:
+        return {
+            "available": False,
+            "reason": _NO_DIAGRAM,
+            "nodes": [],
+            "edges": [],
+            "containers": [],
+        }
+
+
+def _executable_path(path: str | os.PathLike[str]) -> Path:
+    if path is None or path == "":
+        raise ValueError("Native compiler requires an explicit absolute casc executable path.")
+    try:
+        selected = Path(path)
+        if not selected.is_absolute():
+            raise ValueError("Native compiler path must be explicit and absolute.")
+        selected = selected.resolve(strict=True)
+        if not stat.S_ISREG(selected.stat().st_mode):
+            raise ValueError("Native compiler path must point to a regular executable file.")
+        # Windows can implicitly invoke a shell for .bat/.cmd even with shell=False.
+        if selected.suffix.lower() in (".bat", ".cmd"):
+            raise ValueError("Native compiler must be an executable, not a batch launcher.")
+        if os.name == "nt" and selected.suffix.lower() != ".exe":
+            raise ValueError("Native compiler must be a .exe file on Windows.")
+        if not os.access(selected, os.X_OK):
+            raise ValueError("Native compiler file is not executable.")
+        return selected
+    except (OSError, TypeError, RuntimeError) as exc:
+        raise ValueError(f"Native compiler is unavailable: {exc}") from exc
+
+
+def configure_native(path: str | os.PathLike[str]) -> str:
+    """Select an existing absolute executable path; do not run or discover it.
+
+    Raises ValueError on bad configuration. Existing configuration is retained
+    if validation fails. Selection is process-local and is never persisted.
+    """
+    global _native_binary
+    selected = _executable_path(path)
+    _native_binary = selected
+    return str(selected)
+
+
+def _configured_binary() -> Path:
+    if _native_binary is None:
+        raise NativeBackendError(
+            "Native compiler is not configured. Supply an explicit absolute casc executable path."
+        )
+    try:
+        return _executable_path(_native_binary)
+    except ValueError as exc:
+        raise NativeBackendError(str(exc)) from exc
+
+
+def _metadata(mode: str, input_kind: str) -> dict[str, Any]:
+    full_pipeline = mode in ("check", "run") or input_kind == "manifest"
+    return {
+        "adapter": "cas-offline-native-v1",
+        "binary": str(_native_binary) if _native_binary is not None else None,
+        "binary_freshness": "not_verified",
+        "mode": mode,
+        "input_kind": input_kind,
+        "pipeline": "full_compile_then_filter" if full_pipeline else "frontend_only",
+        "may_execute_program": full_pipeline,
+        "diagram_available": False,
+        "timeout_seconds": NATIVE_TIMEOUT_SECONDS,
+        "max_json_depth": NATIVE_MAX_JSON_DEPTH,
+        "max_output_bytes": NATIVE_MAX_OUTPUT_BYTES,
+    }
+
+
+def _failure(message: str, metadata: dict[str, Any]) -> NativeArtifact:
+    return NativeArtifact(
+        {"valid": False, "error": message, "engine": "casc-native-adapter"}, metadata
+    )
+
+
+def _invoke(argv: list[str]) -> subprocess.CompletedProcess[bytes]:
+    """Capture both pipes within one byte budget and bounded cleanup waits.
+
+    Unbuffered pipe readers retain at most 2 MiB combined. They kill the child
+    when another byte exceeds that budget. Daemon readers and bounded joins
+    also prevent a descendant holding an inherited pipe from hanging the UI.
+    Neither communicate() nor an unbounded pipe read is used.
+    """
+    process = subprocess.Popen(
+        argv,
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        shell=False,
+        bufsize=0,
+    )
+    outputs = (bytearray(), bytearray())
+    capture_lock = threading.Lock()
+    stop_reading = threading.Event()
+    output_exceeded = threading.Event()
+    read_errors: list[str] = []
+    total_bytes = 0
+
+    def kill_child() -> None:
+        try:
+            process.kill()
+        except OSError:
+            pass
+
+    def read_pipe(stream: Any, destination: bytearray) -> None:
+        nonlocal total_bytes
+        try:
+            while not stop_reading.is_set():
+                chunk = stream.read(8192)
+                if not chunk:
+                    return
+                with capture_lock:
+                    available = NATIVE_MAX_OUTPUT_BYTES - total_bytes
+                    kept = min(len(chunk), available)
+                    if kept:
+                        destination.extend(chunk[:kept])
+                        total_bytes += kept
+                    if kept < len(chunk):
+                        output_exceeded.set()
+                        stop_reading.set()
+                if output_exceeded.is_set():
+                    kill_child()
+                    return
+        except (OSError, ValueError) as exc:
+            if not stop_reading.is_set():
+                with capture_lock:
+                    read_errors.append(str(exc))
+                stop_reading.set()
+                kill_child()
+        finally:
+            try:
+                stream.close()
+            except OSError:
+                pass
+
+    readers = [
+        threading.Thread(target=read_pipe, args=(process.stdout, outputs[0]), daemon=True),
+        threading.Thread(target=read_pipe, args=(process.stderr, outputs[1]), daemon=True),
+    ]
+    started: list[threading.Thread] = []
+    timed_out = False
+    reap_failed = False
+    try:
+        for reader in readers:
+            reader.start()
+            started.append(reader)
+        try:
+            process.wait(timeout=NATIVE_TIMEOUT_SECONDS)
+        except subprocess.TimeoutExpired:
+            timed_out = True
+            kill_child()
+            try:
+                process.wait(timeout=1.0)
+            except subprocess.TimeoutExpired:
+                reap_failed = True
+    except BaseException:
+        stop_reading.set()
+        kill_child()
+        try:
+            process.wait(timeout=1.0)
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+        raise
+    finally:
+        # The process can exit while a descendant still holds a pipe open.
+        # A fixed shared join budget keeps that case bounded as well.
+        join_deadline = time.monotonic() + 1.0
+        for reader in started:
+            reader.join(timeout=max(0.0, join_deadline - time.monotonic()))
+        incomplete_capture = any(reader.is_alive() for reader in started)
+        if incomplete_capture or len(started) != len(readers):
+            stop_reading.set()
+            kill_child()
+            for stream in (process.stdout, process.stderr):
+                try:
+                    # bufsize=0 gives raw streams without a BufferedReader lock.
+                    stream.close()
+                except OSError:
+                    pass
+
+    with capture_lock:
+        stdout, stderr = bytes(outputs[0]), bytes(outputs[1])
+    if output_exceeded.is_set():
+        raise NativeCaptureError(
+            f"Native compiler output exceeded the combined {NATIVE_MAX_OUTPUT_BYTES}-byte limit; capture is incomplete.",
+            stdout, stderr,
+        )
+    if timed_out:
+        raise subprocess.TimeoutExpired(argv, NATIVE_TIMEOUT_SECONDS, output=stdout, stderr=stderr)
+    if incomplete_capture or reap_failed or read_errors:
+        detail = "; ".join(read_errors) if read_errors else "output pipes did not close within the cleanup deadline"
+        raise NativeCaptureError(f"Native compiler output capture failed: {detail}.", stdout, stderr)
+    return subprocess.CompletedProcess(argv, process.returncode, stdout, stderr)
+
+
+def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"duplicate JSON key {key!r}")
+        result[key] = value
+    return result
+
+
+def _reject_constant(value: str) -> Any:
+    raise ValueError(f"non-JSON numeric constant {value}")
+
+
+def _finite_float(value: str) -> float:
+    parsed = float(value)
+    if not math.isfinite(parsed):
+        raise ValueError(f"JSON number exceeds finite floating-point range: {value}")
+    return parsed
+
+
+def _validate_json_depth(payload: Any) -> None:
+    """Bound nesting iteratively before deepcopy or recursive UI serialization.
+
+    JSON decoding can accept a tree deeper than deepcopy's recursion ceiling.
+    Count the root at depth zero and retain only raw stdout for a depth error;
+    putting the rejected tree into metadata would repeat the same copy failure.
+    """
+    pending = [(payload, 0)]
+    while pending:
+        value, depth = pending.pop()
+        if depth > NATIVE_MAX_JSON_DEPTH:
+            raise ValueError(
+                f"response JSON exceeds maximum nesting depth of {NATIVE_MAX_JSON_DEPTH}"
+            )
+        if isinstance(value, dict):
+            pending.extend((child, depth + 1) for child in value.values())
+        elif isinstance(value, list):
+            pending.extend((child, depth + 1) for child in value)
+
+
+def _validate_payload(payload: Any, mode: str, returncode: int) -> None:
+    if not isinstance(payload, dict):
+        raise ValueError("response must be a JSON object")
+    if "_native" in payload:
+        raise ValueError("response uses reserved adapter metadata key _native")
+    if type(payload.get("valid")) is not bool:
+        raise ValueError("response valid must be a JSON boolean")
+    if "error" not in payload:
+        raise ValueError("response is missing error")
+    valid, error = payload["valid"], payload["error"]
+    if valid and error is not None:
+        raise ValueError("successful response must have error=null")
+    if not valid and (not isinstance(error, str) or not error):
+        raise ValueError("invalid response must have a nonempty error string")
+    expected_code = 0 if valid else 1
+    if returncode != expected_code:
+        raise ValueError(
+            f"exit code {returncode} disagrees with valid={str(valid).lower()} "
+            f"(expected {expected_code})"
+        )
+    required = {
+        "lex": ("tokens",),
+        "parse": ("ast",),
+        "check": ("type", "warnings"),
+        "run": ("source", "engine", "tokens", "ast", "type", "bytecode", "result", "warnings"),
+    }[mode]
+    # File/manifest read errors may contain only valid and error in this CLI.
+    if valid:
+        missing = [field for field in required if field not in payload]
+        if missing:
+            raise ValueError("successful response is missing " + ", ".join(missing))
+    for field in ("source", "engine"):
+        if field in payload and not isinstance(payload[field], str):
+            raise ValueError(f"response {field} must be a string")
+    for field in ("tokens", "bytecode", "warnings"):
+        if field in payload and not isinstance(payload[field], list):
+            raise ValueError(f"response {field} must be an array")
+    for token in payload.get("tokens", []):
+        if (
+            not isinstance(token, dict)
+            or not isinstance(token.get("kind"), str)
+            or not isinstance(token.get("value"), str)
+            or type(token.get("position")) is not int
+            or token["position"] < 0
+        ):
+            raise ValueError("response contains a malformed token")
+    for instruction in payload.get("bytecode", []):
+        if (
+            not isinstance(instruction, dict)
+            or not isinstance(instruction.get("opcode"), str)
+            or "arg" not in instruction
+        ):
+            raise ValueError("response contains a malformed bytecode instruction")
+    if any(not isinstance(item, str) for item in payload.get("warnings", [])):
+        raise ValueError("response warnings must contain only strings")
+    for field in ("ast", "type"):
+        if field in payload and payload[field] is not None:
+            if not isinstance(payload[field], dict):
+                raise ValueError(f"response {field} must be an object or null")
+            label = "node" if field == "ast" else "kind"
+            if not isinstance(payload[field].get(label), str):
+                raise ValueError(f"response {field} is missing its string {label}")
+        elif valid and field in required:
+            raise ValueError(f"successful response {field} cannot be null")
+    # result deliberately has no conversion: Rust can return a number, string,
+    # structured value, or null. RPM completeness is a string in the native IR.
+
+
+def compile_native(
+    source: str | None = None,
+    file_path: str | os.PathLike[str] | None = None,
+    manifest_path: str | os.PathLike[str] | None = None,
+    mode: str = "run",
+) -> NativeArtifact:
+    """Compile exactly one input through the explicitly selected native CLI.
+
+    The source argument is one unchanged argv item, not shell text. File and
+    manifest paths are passed unchanged with the caller's working directory;
+    casc itself resolves package entries and module imports. Backend failures
+    and malformed responses return invalid artifacts rather than fake results.
+    """
+    supplied = [source is not None, file_path is not None, manifest_path is not None]
+    input_kind = "source" if supplied[0] else "file" if supplied[1] else "manifest" if supplied[2] else "none"
+    metadata = _metadata(mode, input_kind)
+    if mode not in NATIVE_MODES:
+        return _failure("Unsupported native mode; choose lex, parse, check, or run.", metadata)
+    if sum(supplied) != 1:
+        return _failure("Native compilation requires exactly one source, file, or manifest input.", metadata)
+    try:
+        binary = _configured_binary()
+        argv = [str(binary), "--mode", mode]
+        if source is not None:
+            if not isinstance(source, str):
+                raise ValueError("Native source must be a string.")
+            if "\x00" in source:
+                raise ValueError("Native source cannot contain a NUL character.")
+            if source in _CLI_OPTIONS:
+                raise ValueError("Source matches a casc command option; use file input to compile it literally.")
+            metadata["input_source"] = source
+            argv.append(source)
+        else:
+            selected = file_path if file_path is not None else manifest_path
+            raw_path = os.fspath(selected)
+            if not isinstance(raw_path, str) or not raw_path or "\x00" in raw_path:
+                raise ValueError("Native input path must be a nonempty text path without NUL characters.")
+            # Do not resolve symlinks here: compile_file uses the supplied
+            # path's parent as the base for relative CAS module imports.
+            metadata["input_path"] = raw_path
+            argv.extend(["--file" if file_path is not None else "--manifest", raw_path])
+        completed = _invoke(argv)
+    except subprocess.TimeoutExpired as exc:
+        metadata["stdout_bytes_hex"] = (exc.stdout or b"").hex()
+        metadata["stderr_bytes_hex"] = (exc.stderr or b"").hex()
+        return _failure(f"Native compiler timed out after {NATIVE_TIMEOUT_SECONDS} seconds.", metadata)
+    except NativeCaptureError as exc:
+        metadata["capture_incomplete"] = True
+        metadata["stdout_bytes_hex"] = exc.stdout.hex()
+        metadata["stderr_bytes_hex"] = exc.stderr.hex()
+        return _failure(str(exc), metadata)
+    except (NativeBackendError, OSError, ValueError, TypeError, RuntimeError) as exc:
+        return _failure(f"Native compiler unavailable or input rejected: {exc}", metadata)
+
+    metadata["returncode"] = completed.returncode
+    try:
+        stdout = completed.stdout.decode("utf-8")
+        stderr = completed.stderr.decode("utf-8")
+    except UnicodeError as exc:
+        metadata["stdout_bytes_hex"] = completed.stdout.hex()
+        metadata["stderr_bytes_hex"] = completed.stderr.hex()
+        return _failure(f"Native compiler returned invalid UTF-8: {exc}", metadata)
+    metadata["stderr"] = stderr
+    try:
+        payload = json.loads(
+            stdout,
+            object_pairs_hook=_unique_object,
+            parse_constant=_reject_constant,
+            parse_float=_finite_float,
+        )
+    except (ValueError, RecursionError) as exc:
+        metadata["raw_stdout"] = stdout
+        return _failure(f"Native compiler returned malformed JSON: {exc}", metadata)
+    try:
+        _validate_json_depth(payload)
+    except ValueError as exc:
+        metadata["raw_stdout"] = stdout
+        return _failure(f"Native compiler response rejected: {exc}", metadata)
+    try:
+        _validate_payload(payload, mode, completed.returncode)
+    except ValueError as exc:
+        metadata["raw_stdout"] = stdout
+        metadata["raw_payload"] = payload
+        return _failure(f"Native compiler response rejected: {exc}", metadata)
+    return NativeArtifact(payload, metadata)
+
+
+def native_grammar() -> str:
+    """Return the selected binary's actual --grammar text, without alteration.
+
+    Raises NativeBackendError when unavailable or malformed. A grammar response
+    does not prove that a selected binary matches the latest inspected source.
+    """
+    binary = _configured_binary()
+    try:
+        completed = _invoke([str(binary), "--grammar"])
+        grammar = completed.stdout.decode("utf-8")
+        stderr = completed.stderr.decode("utf-8")
+    except subprocess.TimeoutExpired as exc:
+        raise NativeBackendError(
+            f"Native grammar request timed out after {NATIVE_TIMEOUT_SECONDS} seconds."
+        ) from exc
+    except (OSError, UnicodeError, ValueError) as exc:
+        raise NativeBackendError(f"Native grammar is unavailable: {exc}") from exc
+    if completed.returncode != 0:
+        raise NativeBackendError(
+            f"Native grammar request failed with exit code {completed.returncode}: {stderr or grammar}"
+        )
+    if not grammar.strip() or "<program>" not in grammar or "::=" not in grammar:
+        raise NativeBackendError("Native compiler did not return a recognizable CAS grammar.")
+    return grammar

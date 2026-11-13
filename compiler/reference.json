@@ -1,0 +1,1163 @@
+{
+  "examples": [
+    {
+      "name": "Operator Composition (x)",
+      "category": "Foundational",
+      "source": "^2^P_{F2} × ^8^P_{F6}",
+      "description": "Positive in the Principled domain under F2 Wisdom integrates with Above/Cause in that domain under F6 Structure.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Domain Descent (P -> C)",
+      "category": "Foundational",
+      "source": "^5^P → ^5^C",
+      "description": "Female/Differentiation moves from a high-level principle into a concrete cognitive interpretation.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Involution Division",
+      "category": "Foundational",
+      "source": "^2^P / ^3^P",
+      "description": "A Positive principled state is compared against its Negative involution pair to expose contrast or missing balance.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Co-Presence (+)",
+      "category": "Foundational",
+      "source": "^5^E + ^2^E",
+      "description": "Female/Differentiation and Positive are both present in the Evaluative domain without forcing them into a single integrated result.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Prerequisite Chain",
+      "category": "Foundational",
+      "source": "RPM(F5)",
+      "description": "Show the prerequisite ladder for Foundation 5, the Agency drive.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Fractal Analysis",
+      "category": "Foundational",
+      "source": "Φ<3:8:5:2>",
+      "description": "Read the operator sequence Negative, Above/Cause, Female/Differentiation, Positive as a composed cognitive fractal.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Analytical-register Negative",
+      "category": "v7.5 Registers",
+      "source": "^3^P|A",
+      "description": "Negative/Boundary is operating as a principled analytical judgment.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Affective-register Negative",
+      "category": "v7.5 Registers",
+      "source": "^3^P|f",
+      "description": "Negative/Boundary is operating as a principled felt or affective stance.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Compound state, Transcendent",
+      "category": "v7.5 Registers",
+      "source": "^2^C_{F2}|T",
+      "description": "Positive in the Cognitive domain, under F2 Wisdom, is expressed through the Transcendent register.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Recipe definition",
+      "category": "v7.6 Production",
+      "source": "Θ(Ω_focus) = 0.6·^1^C + 0.4·^7^O → Ω_focus",
+      "description": "Focus is produced from a 60 percent Mind/Cognitive ingredient plus a 40 percent Rhythm/Operational ingredient.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Theoretical yield query",
+      "category": "v7.6 Production",
+      "source": "Y_T(Ω_focus)",
+      "description": "Represent a theoretical yield query for focus. The compiler returns an unevaluated symbolic query, not a numerical yield.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Recipe with catalyst",
+      "category": "v7.6 Production",
+      "source": "Θ(Ω_book) | κ_deadline = 0.5·^7^P + 0.5·^6^C → Ω_book",
+      "description": "A book-output recipe uses a deadline catalyst while combining Rhythm/Principled and Male/Structure/Cognitive ingredients evenly.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Register-set specification",
+      "category": "v7.7 Operator Discipline",
+      "source": "^3^P|⟨A,f,T⟩",
+      "description": "The same Negative/Principled operation is explicitly viewed across Analytical, Affective, and Transcendent registers.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Register co-presence (defeasible)",
+      "category": "v7.7 Operator Discipline",
+      "source": "^3^P|A + ^3^P|f + ^3^P|T",
+      "description": "Analytical, affective, and transcendent forms of the same Negative/Principled operation are present together but not yet fused.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Cross-register integration -> emergent",
+      "category": "v7.7 Operator Discipline",
+      "source": "(^3^P|A × ^3^P|f × ^3^P|T) = Ω_refusal",
+      "description": "Analytical, affective, and transcendent boundary signals integrate into the named emergent result refusal.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Membership (^N in Noetics)",
+      "category": "Set Theory",
+      "source": "^2 ∈ Noetics",
+      "description": "Positive is one member of the ten Noetic operators.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Typed Noetic cluster",
+      "category": "Set Theory",
+      "source": "NoeticCluster{^2, ^7} ⊆ Noetics",
+      "description": "The cluster containing Positive and Rhythm is a subset of the full Noetics set.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "State variant cluster",
+      "category": "Set Theory",
+      "source": "StateVariantCluster{^3^P_{F2}|A, ^2^C|f}",
+      "description": "Group an Analytical Negative/Principled/F2 Wisdom state and an Affective Positive/Cognitive state.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Typed State cluster",
+      "category": "Set Theory",
+      "source": "StateCluster{^2^P, ^7^O} ⊆ States",
+      "description": "The states Positive/Principled and Rhythm/Operational form a valid subset of the forty-state CAS space.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Set union",
+      "category": "Set Theory",
+      "source": "NoeticCluster{^2, ^7} ∪ NoeticCluster{^7, ^8}",
+      "description": "Combine the two Noetic clusters into one cluster containing Positive, Rhythm, and Above/Cause.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Relation cluster",
+      "category": "Set Theory",
+      "source": "RelationCluster{^5^P → ^5^C, ^5^C → ^5^E}",
+      "description": "Represent a dependency chain where Female/Differentiation descends from Principled to Cognitive to Evaluative.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "CAS coordinate tuple",
+      "category": "Set Theory",
+      "source": "Coordinate{^2, P, F2, A}",
+      "description": "Name the coordinate Positive, Principled domain, F2 Wisdom, Analytical register.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Finite subobject meet",
+      "category": "Set Theory",
+      "source": "Pullback(NoeticCluster{^2, ^7}, NoeticCluster{^7, ^8})",
+      "description": "Find the shared overlap between two Noetic clusters; here the common member is Rhythm.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Namespaced product",
+      "category": "Set Theory",
+      "source": "Product(Noetics, Domains)",
+      "description": "Construct all pairings of the ten Noetics with the four Domains, producing the forty CAS state positions.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Compound state in 40-state space",
+      "category": "Set Theory",
+      "source": "^2^P ∈ States",
+      "description": "Positive in the Principled domain is one member of the forty-state CAS space.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Drive membership",
+      "category": "Set Theory",
+      "source": "F2 ∈ Drives",
+      "description": "F2 Wisdom is one member of the seven CAS drives.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Proper subset (28 sub-foundations)",
+      "category": "Set Theory",
+      "source": "Foundation_1 ⊂ SubFoundations",
+      "description": "Foundation 1 names a proper subset inside the complete twenty-eight SubFoundations collection.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Empty set is subset of every set",
+      "category": "Set Theory",
+      "source": "∅ ⊆ Noetics",
+      "description": "The empty set is validly contained inside the Noetics set.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Cardinality of Noetics (= 10)",
+      "category": "Set Theory",
+      "source": "|Noetics|",
+      "description": "Count the Noetics set; it contains ten operators.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Cardinality of state space (= 40)",
+      "category": "Set Theory",
+      "source": "|States|",
+      "description": "Count the CAS state space; ten Noetics times four Domains gives forty states.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Typed bindings and functions",
+      "category": "Language workflow",
+      "source": "let start: state[C] = C2; fn step(x: state[C]): state[C] = x * C8; step(start)",
+      "description": "Bind a Cognitive state and pass it through a function whose input and output must be Cognitive states.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Finite assertion result",
+      "category": "Language workflow",
+      "source": "|States| = 40",
+      "description": "Check the finite state-set cardinality; inspect the Boolean holds field separately from compiler validity.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Nesting cancellation readings",
+      "category": "Latest nesting",
+      "source": "^8^C ∘ ^9^C",
+      "description": "Inspect both canonical readings and the cancellation criterion. The legacy composed operator is a separate projection.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Unresolved nesting readings",
+      "category": "Latest nesting",
+      "source": "^3^C ∘ ^2^C",
+      "description": "Inspect differing nesting readings and open questions without forcing an agreed canonical answer.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Cross-domain nesting warning",
+      "category": "Latest nesting",
+      "source": "^8^C ∘ ^9^E",
+      "description": "Keep each term's Domain and show the compiler's warning about the Domain of the nested whole.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "CAS-Ohm declared attention flow",
+      "category": "CAS-Ohm arithmetic",
+      "source": "let scale = ohm_scale(\"example-v1\", \"drive-unit\", \"attention-unit\"); let drive = ohm_drive(\"12\", scale, \"design\", \"example:drive\"); let constraint = ohm_constraint(\"4\", scale, \"design\", \"example:constraint\"); ohm_flow(drive, constraint)",
+      "description": "Calculate 12/4 = 3 attention units on one declared scale. This is a design calculation, not a measurement or validated cognitive outcome.",
+      "language": "cas",
+      "mode": "run"
+    },
+    {
+      "name": "Ohm Effective Constraint",
+      "category": "CAS-Ohm / CCDL",
+      "source": "let scale: ohm_scale = ohm_scale(\"example-v1\", \"declared-drive\", \"declared-attention\")\nlet potential: ohm_drive = ohm_drive(\"12\", scale, \"design\", \"example:potential\")\nlet supplied_flow: ohm_attention = ohm_attention(\"3\", scale, \"supplied_observation\", \"example:caller-supplied-reading\")\nohm_effective_constraint(potential, supplied_flow)\n",
+      "language": "cas",
+      "mode": "run",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning."
+    },
+    {
+      "name": "Ohm Exact Fraction",
+      "category": "CAS-Ohm / CCDL",
+      "source": "let scale: ohm_scale = ohm_scale(\"exact-demo-v1\", \"declared-drive\", \"declared-attention\")\nlet potential: ohm_drive = ohm_drive(\"1\", scale, \"design\", \"example:potential\")\nlet resistance: ohm_constraint = ohm_constraint(\"3\", scale, \"design\", \"example:constraint\")\nohm_flow(potential, resistance)\n",
+      "language": "cas",
+      "mode": "run",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning."
+    },
+    {
+      "name": "Ohm Flow",
+      "category": "CAS-Ohm / CCDL",
+      "source": "let scale: ohm_scale = ohm_scale(\"example-v1\", \"declared-drive\", \"declared-attention\")\nlet potential: ohm_drive = ohm_drive(\"12\", scale, \"design\", \"example:potential\")\nlet resistance: ohm_constraint = ohm_constraint(\"4\", scale, \"design\", \"example:constraint\")\nohm_flow(potential, resistance)\n",
+      "language": "cas",
+      "mode": "run",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning."
+    },
+    {
+      "name": "Ohm Invalid Zero Constraint",
+      "category": "CAS-Ohm / CCDL",
+      "source": "let scale: ohm_scale = ohm_scale(\"example-v1\", \"declared-drive\", \"declared-attention\")\nlet potential: ohm_drive = ohm_drive(\"12\", scale, \"design\", \"example:potential\")\nlet resistance: ohm_constraint = ohm_constraint(\"0\", scale, \"design\", \"example:constraint\")\nohm_flow(potential, resistance)\n",
+      "language": "cas",
+      "mode": "run",
+      "description": "Intentional error: zero constraint must be rejected, not divided through."
+    },
+    {
+      "name": "Ohm Required Drive",
+      "category": "CAS-Ohm / CCDL",
+      "source": "let scale: ohm_scale = ohm_scale(\"example-v1\", \"declared-drive\", \"declared-attention\")\nlet desired_flow: ohm_attention = ohm_attention(\"3\", scale, \"design\", \"example:desired-flow\")\nlet resistance: ohm_constraint = ohm_constraint(\"4\", scale, \"design\", \"example:constraint\")\nohm_required_drive(desired_flow, resistance)\n",
+      "language": "cas",
+      "mode": "run",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning."
+    },
+    {
+      "name": "Pcba Feedback",
+      "category": "CAS-Ohm / CCDL",
+      "source": "// Exact declared simple-cycle gain: 0.5 * 0.5 = 1/4.\n// This static path calculation is not a dynamical or empirical stability claim.\ncircuit bounded_feedback {\n    input: prompt;\n    output: response;\n    node question: ^8^C_{F2}|A;\n    node bias: ^5^C_{F2}|A;\n    node answer: ^9^C_{F6}|A;\n    cjt decision: CJT< question | bias => answer > [beta=0.5, gm=0.1];\n    feedback return_path: answer -> question [beta=0.5];\n    probe tp_answer: answer;\n}\n",
+      "language": "ccdl",
+      "mode": "run",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning."
+    },
+    {
+      "name": "Pcba Layout",
+      "category": "CAS-Ohm / CCDL",
+      "source": "// A declared layout and one downward via, not an executed circuit.\n// Inline via endpoints retain their own identities; no named-node join is inferred.\nboard downward_layout {\n    layer P: [ charter: ^5^P_{F7}|T ];\n    layer C: [ understand: ^1^C_{F2}|A ];\n    via intake: ^5^P -> ^1^C;\n}\n",
+      "language": "ccdl",
+      "mode": "run",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning."
+    },
+    {
+      "name": "Pcba Schematic",
+      "category": "CAS-Ohm / CCDL",
+      "source": "// Authored structural example; execution and measured cognition are unavailable.\n// I/O terminals are declared but untyped and deliberately unconnected.\n// The checker must warn about them; it must not invent prompt-to-response wiring.\ncircuit guarded_chain {\n    input: prompt;\n    output: response;\n    node question: ^8^C_{F2}|A;\n    node charter: ^5^P_{F7}|T;\n    node answer: ^9^C_{F6}|A;\n    cjt decision: CJT< question | charter => answer > [beta=0.5, gm=0.1, sat=0.95, cutoff=0.1];\n    resistor restraint: Resistor< question, R=30 >;\n    capacitor memory: Capacitor< charter, C=10, leakage=0.01 >;\n    inductor habit: Inductor< answer, L=1 >;\n    probe tp_answer: answer;\n}\n",
+      "language": "ccdl",
+      "mode": "run",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning."
+    },
+    {
+      "name": "Cascade",
+      "category": "Bounded simulation",
+      "source": "// Topological evaluation must run z_first before a_second despite their names.\nboard cascade {\n    input: stimulus;\n    output: answer;\n    node cause: ^8^C_{F2}|A;\n    node bias: ^5^P_{F7}|T;\n    node middle: ^9^C_{F6}|A;\n    node effect: ^9^C_{F6}|A;\n    cjt a_second: CJT< middle | bias => effect > [beta=0.5, sat=0.9, cutoff=0.1];\n    cjt z_first: CJT< cause | bias => middle > [beta=2, sat=0.75, cutoff=0.1];\n    probe observed: effect;\n}\n",
+      "language": "ccdl",
+      "mode": "simulate",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning.",
+      "inputs": "{\n  \"profile\": \"cas.pcba.scalar-fixed-bias/0.1\",\n  \"input_bindings\": {\"stimulus\": \"cause\"},\n  \"output_bindings\": {\"answer\": \"effect\"},\n  \"initial_state\": {\n    \"tick\": 0,\n    \"nodes\": {\"cause\": \"0\", \"bias\": \"0.5\", \"middle\": \"0.4\", \"effect\": \"0.6\"}\n  },\n  \"schedule\": [\n    {\"stimulus\": \"0.1\"},\n    {\"stimulus\": \"0.5\"},\n    {\"stimulus\": \"0\"},\n    {\"stimulus\": \"0.375\"}\n  ]\n}\n",
+      "steps": 4
+    },
+    {
+      "name": "Fixed Bias",
+      "category": "Bounded simulation",
+      "source": "// Scalar design simulation; values are declared activations, not measurements.\nboard fixed_bias {\n    input: drive;\n    output: response;\n    node cause: ^8^C_{F2}|A;\n    node bias: ^5^P_{F7}|T;\n    node effect: ^9^C_{F6}|A;\n    cjt stage: CJT< cause | bias => effect > [beta=2, sat=0.85, cutoff=0.1];\n    probe observed: effect;\n}\n",
+      "language": "ccdl",
+      "mode": "simulate",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning.",
+      "inputs": "{\n  \"profile\": \"cas.pcba.scalar-fixed-bias/0.1\",\n  \"input_bindings\": {\"drive\": \"cause\"},\n  \"output_bindings\": {\"response\": \"effect\"},\n  \"initial_state\": {\n    \"tick\": 0,\n    \"nodes\": {\"cause\": \"0\", \"bias\": \"0.1\", \"effect\": \"0.6\"}\n  },\n  \"schedule\": [\n    {\"drive\": \"0.2\"},\n    {\"drive\": \"0.425\"},\n    {\"drive\": \"0.9\"},\n    {\"drive\": \"0\"}\n  ]\n}\n",
+      "steps": 4
+    },
+    {
+      "name": "Ohm Independent",
+      "category": "Bounded simulation",
+      "source": "// The two named nets remain independent even though their state types match.\ncircuit ohm_independent {\n    input: supply_a, supply_b;\n    output: flow_a, flow_b;\n    node rail_a: ^8^C_{F5}|A;\n    node rail_b: ^8^C_{F5}|A;\n    resistor r_b: Resistor< rail_b, R=3 >;\n    resistor r_a: Resistor< rail_a, R=30 >;\n    probe tp_a: rail_a;\n    probe tp_b: rail_b;\n}\n",
+      "language": "ccdl",
+      "mode": "simulate",
+      "description": "Supplied compiler example. Read diagnostics and result fields for its exact meaning.",
+      "inputs": "{\n  \"profile\": \"cas.pcba.ohm-resistor/0.1\",\n  \"scale\": {\"id\": \"ohm-independent-design-v1\", \"drive_unit\": \"declared-drive\", \"attention_unit\": \"declared-attention\"},\n  \"input_bindings\": {\"supply_a\": \"rail_a\", \"supply_b\": \"rail_b\"},\n  \"output_bindings\": {\"flow_a\": \"rail_a\", \"flow_b\": \"rail_b\"},\n  \"initial_state\": {},\n  \"schedule\": [\n    {\n      \"supply_a\": {\"quantity\": \"drive\", \"value\": \"9\", \"origin\": \"design\", \"reference\": \"fixture:path-a\"},\n      \"supply_b\": {\"quantity\": \"drive\", \"value\": \"1\", \"origin\": \"design\", \"reference\": \"fixture:path-b\"}\n    }\n  ]\n}\n",
+      "steps": 1
+    },
+    {
+      "name": "Ohm Resistor",
+      "category": "Bounded simulation",
+      "source": "// Runtime routing is explicit in ohm_resistor.inputs.json.\n// Drive and attention have distinct declared quantity kinds on this net.\ncircuit ohm_resistor {\n    input: supply;\n    output: flow;\n    node rail: ^8^C_{F5}|A;\n    resistor r1: Resistor< rail, R=30 >;\n    probe tp_flow: rail;\n}\n",
+      "language": "ccdl",
+      "mode": "simulate",
+      "description": "Original supplied example, retained unchanged: the checker rejects its reserved node name rail. Use Ohm Independent for an accepted resistor simulation.",
+      "inputs": "{\n  \"profile\": \"cas.pcba.ohm-resistor/0.1\",\n  \"scale\": {\n    \"id\": \"ohm-resistor-design-v1\",\n    \"drive_unit\": \"declared-drive\",\n    \"attention_unit\": \"declared-attention\"\n  },\n  \"input_bindings\": {\"supply\": \"rail\"},\n  \"output_bindings\": {\"flow\": \"rail\"},\n  \"initial_state\": {},\n  \"schedule\": [\n    {\"supply\": {\"quantity\": \"drive\", \"value\": \"9\", \"origin\": \"design\", \"reference\": \"fixture:drive-nine\"}},\n    {\"supply\": {\"quantity\": \"drive\", \"value\": \"0\", \"origin\": \"design\", \"reference\": \"fixture:zero-drive\"}},\n    {\"supply\": {\"quantity\": \"drive\", \"value\": \"1\", \"origin\": \"design\", \"reference\": \"fixture:drive-one\"}}\n  ]\n}\n",
+      "steps": 3
+    },
+    {
+      "name": "Relative module import",
+      "category": "Language workflow",
+      "source": "use \"helpers.cas\"; step(C2)",
+      "language": "cas",
+      "mode": "run",
+      "modules": {
+        "helpers.cas": "export fn step(x: state[C]): state[C] = x * C8"
+      },
+      "description": "The imported CAS module lives only in this browser workspace."
+    }
+  ],
+  "casGrammar": "<program>       ::= <statement> (\";\" <statement>)* ;\n<statement>     ::= <export_stmt> | <let_stmt> | <fn_stmt> | <use_stmt> | <expression> ;\n<export_stmt>   ::= \"export\" (<let_stmt> | <fn_stmt>) ;\n<let_stmt>      ::= \"let\" <ident> (\":\" <type_expr>)? \"=\" <expression> ;\n<fn_stmt>       ::= \"fn\" <ident> \"(\" <typed_param_list>? \")\" (\":\" <type_expr>)? \"=\" <expression> ;\n<use_stmt>      ::= \"use\" <string> ;\n<typed_param_list> ::= <typed_param> (\",\" <typed_param>)* ;\n<typed_param>   ::= <ident> (\":\" <type_expr>)? ;\n<type_expr>     ::= <type_name> (\"[\" <domain_list> \"]\")? ;\n<type_name>     ::= \"state\" | \"drive\" | \"string\" | \"void\" | \"function\" | \"fractal\" | \"rpm\" | \"relation\" | \"program\" | \"number\" | \"tuple\" | \"meta_set\" | \"meta_symbol\" | \"meta_assertion\" | \"ohm_scale\" | \"ohm_drive\" | \"ohm_attention\" | \"ohm_constraint\" | \"any\" ;\n<domain_list>   ::= <domain> (\",\" <domain>)* ;\n<expression>    ::= <meta_relation> ;\n<meta_relation> ::= <set_expr> ((\"∈\" | \"∉\" | \"⊂\" | \"⊆\" | \"⊃\" | \"⊇\") <set_expr>)* ;\n<set_expr>      ::= <relation> ((\"∪\" | \"∩\" | \"∖\" | \"union\" | \"intersect\" | \"setminus\") <relation>)* ;\n<relation>      ::= <sum> ((\"->\" | \"<-\" | \"<->\") <sum>)* ;\n<sum>           ::= <product> ((\"+\" | \"-\") <product>)* ;\n<product>       ::= <primary> ((\"*\" | \"/\" | \"∘\" | \"×\" | \"÷\") <primary>)* ;\n<primary>       ::= <state> | <state_ref> | <drive_ref> | <rpm_call> | <phi_literal> | <tuple_literal> | <cardinality> | <meta_set> | <typed_meta_set> | <meta_symbol> | \"∅\" | <number> | <call> | <ident> | <string> | \"(\" <expression> \")\" ;\n<cardinality>   ::= \"|\" <relation> \"|\" ;\n<meta_set>      ::= \"Noetics\" | \"Domains\" | \"Worlds\" | \"Drives\" | \"Registers\" | \"States\" | \"Foundations\" | \"SubFoundations\" | \"Foundation_1\" | ... | \"Foundation_7\" ;\n<typed_meta_set> ::= \"{\" <arg_list>? \"}\" | (\"NoeticSet\" | \"NoeticCluster\" | \"Cluster\" | \"StateSet\" | \"StateCluster\" | \"StateVariantSet\" | \"StateVariantCluster\" | \"RelationSet\" | \"RelationCluster\" | \"DriveSet\" | \"DomainSet\" | \"RegisterSet\" | \"FoundationSet\" | \"SubFoundationSet\") \"{\" <arg_list>? \"}\" ;\n<tuple_literal> ::= (\"Tuple\" | \"Coordinate\") \"{\" <arg_list>? \"}\" | (\"⟨\" | \"<\") <arg_list>? (\"⟩\" | \">\") ;\n<meta_symbol>   ::= <domain> | \"T\" | \"A\" | \"f\" | \"E\" ;\n<call>          ::= <ident> \"(\" <arg_list>? \")\" ;\n<arg_list>      ::= <expression> (\",\" <expression>)* ;\n<rpm_call>      ::= \"RPM\" \"(\" (<state> | <state_ref> | <drive_ref>) \")\" ;\n<phi_literal>   ::= (\"Phi\" | \"Φ\") (\"<\" | \"⟨\") <sequence> (\">\" | \"⟩\") ;\n<sequence>      ::= <digit> (\":\" <digit>)* ;\n<state>         ::= <operator> \"^\" <domain> (\"_{\" <drive_ref> \"}\")? ;\n<state_ref>     ::= <domain> <digit> ;\n<operator>      ::= \"CO-\" <digit> ;\n<drive_ref>     ::= \"F\" <drive_digit> ;\n<ident>         ::= <letter> (<letter> | <digit> | \"_\")* ;\n<string>        ::= '\"' <char>* '\"' ;\n<domain>        ::= \"P\" | \"C\" | \"E\" | \"O\" ;\n<letter>        ::= \"A\" | ... | \"Z\" | \"a\" | ... | \"z\" | \"_\" ;\n<digit>         ::= \"0\" | \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" | \"8\" | \"9\" ;\n<drive_digit>   ::= \"1\" | \"2\" | \"3\" | \"4\" | \"5\" | \"6\" | \"7\" ;",
+  "ccdlGrammar": "Bounded CCDL static subset (case-sensitive):\ndocument := ('circuit' | 'board') identifier '{' statement* '}'\nstatement := input/output | node | component | feedback | probe | assert\n           | layer | via | transition | series | let\ninput/output := ('input' | 'output') ':' identifier (',' identifier)* ';'\nnode := 'node' identifier ':' CAS_state ';'\ncomponent := kind identifier ':' Type '<' arguments '>' ['[' parameters ']'] ';'\nCJT arguments := cause '|' bias '=>' effect\npassive arguments := net ',' (R|C|L) '=' decimal [', leakage=' decimal]\nDiode/Transformer arguments := ^Domain '->' ^Domain [', ratio=' decimal]\nfeedback := 'feedback' [identifier ':'] ref '->' ref ['[' parameters ']'] ';'\nprobe := 'probe' identifier ':' ref ';'\nlayer := 'layer' Domain ':' '[' identifier ':' CAS_state (',' identifier ':' CAS_state)* ']' ';'\nvia := 'via' identifier ':' (CAS_state|^Domain) '->' (CAS_state|^Domain) ['[' parameters ']'] ';'\nImplemented component checks: CJT, Resistor, Capacitor, Inductor, Diode, Transformer.\nLayers/vias are board-only. Parameters use finite decimals, not exponents/units.\nCAS states use ^0..^9, optional ^P/^C/^E/^O, _{F1}.._{F7}, and |T/|A/|f/|E/register sets.\nThe checker requires an explicit Domain for typed net states.\nParsed series/let forms and unsupported component/statement semantics are rejected.\nStatic assertions are limited to equality of known CJT parameters or named bias nets.\nTemporal execution, general macro expansion, full operator admissibility and empirical\ncognitive behavior are not implemented. A static PASS covers only listed checks.\n",
+  "palette": "────────────────────────────────────── Symbol Palette ──────────────────────────────────────\nΘ    Recipe Theta\nΩ_   Production target Omega_name\nΛ_   Leakage Lambda_name\nκ_   Catalyst kappa_name\nι_   Inhibitor iota_name\nη    Efficiency eta\nΦ    Fractal Phi\n×    Compose / multiply\n·    Recipe coefficient\n→    Yields / dependency\n∈    Member\n∉    Not member\n⊂    Proper subset\n⊆    Subset\n⊃    Proper superset\n⊇    Superset\n∪    Union\n∩    Intersection\n∖    Difference\n∅    Empty set\n⟨    Open angle register-set\n⟩    Close angle register-set",
+  "reference": "──────────────────────────────────────── Reference ─────────────────────────────────────────\nNoetics (^0 - ^9)\n  ^0  Idea\n  ^1  Mind\n  ^2  Positive\n  ^3  Negative\n  ^4  Vibration\n  ^5  Female\n  ^6  Male\n  ^7  Rhythm\n  ^8  Above/Cause\n  ^9  Below/Effect\n\nDomains\n  ^P  Principled\n  ^C  Cognitive\n  ^E  Evaluative\n  ^O  Operational\n\nDrives\n  F1  Unity\n  F2  Wisdom\n  F3  Vitality\n  F4  Connection\n  F5  Agency\n  F6  Structure\n  F7  Purpose\n\nRegisters\n  |T  Transcendent\n  |A  Analytical\n  |f  Affective\n  |E  Embodied",
+  "dictionary": [
+    {
+      "term": "Cognitive Architecture System",
+      "category": "Framework",
+      "notation": "CAS",
+      "definition": "A formal framework for describing how any cognitive system — human, AI, biological, or hypothetical — composes Ideas. Built on 10 Noetic operators x 4 Domains (40 states), 7 Drives, and 4 Registers.",
+      "example": "Product(Noetics, Domains)",
+      "learn": "Universal Applicability: every primitive must apply to humans AND AI AND biological cognition."
+    },
+    {
+      "term": "CAS",
+      "category": "Framework",
+      "notation": "Cognitive Architecture Syntax",
+      "definition": "The compiler notation for CAS — operators, domains, drives, registers, production recipes, and finite meta-logic.",
+      "example": "Product(Noetics, Domains)",
+      "learn": "Start with axes before composing expressions."
+    },
+    {
+      "term": "Noetic",
+      "category": "Axes",
+      "notation": "^0..^9",
+      "definition": "A cognitive primitive operator — one of the ten structural dynamics by which a Mind relates to an Idea (Idea, Mind, Positive, Negative, Vibration, Female, Male, Rhythm, Above/Cause, Below/Effect).",
+      "example": "^2 ∈ Noetics",
+      "learn": "Names are verbatim canonical from the Tootra Math Handbook; do not paraphrase."
+    },
+    {
+      "term": "Domain",
+      "category": "Axes",
+      "notation": "^P ^C ^E ^O",
+      "definition": "The operational tier where a Noetic fires: Principled (values, identity), Cognitive (thought), Evaluative (judgment), Operational (action). Total order P > C > E > O.",
+      "example": "^5^P -> ^5^C",
+      "learn": "Domain Descent runs P -> C -> E -> O; feedback runs O -> P."
+    },
+    {
+      "term": "Drive",
+      "category": "Axes",
+      "notation": "_{F1}.._{F7}",
+      "definition": "One of seven core motivational architectures (Unity, Wisdom, Vitality, Connection, Agency, Structure, Purpose). Drives pair into involutions: F1<->F7, F2<->F6, F3<->F5; F4 is self-dual.",
+      "example": "^2^P_{F2}",
+      "learn": "Each Drive has a structural opposite — its inversion partner."
+    },
+    {
+      "term": "Foundation",
+      "category": "Axes",
+      "notation": "F1..F7",
+      "definition": "Synonym for Drive. The seven foundational motivational primitives that pressure cognition; 7 x 4 Domains = 28 SubFoundations.",
+      "example": "F2 ∈ Drives",
+      "learn": "Drive and Foundation are interchangeable terms in CAS."
+    },
+    {
+      "term": "Register",
+      "category": "Axes",
+      "notation": "|T |A |f |E",
+      "definition": "The phenomenological register — operational character of a state: Transcendent (purpose-orienting), Analytical (logical), Affective (felt valence), Embodied (sensorimotor).",
+      "example": "^3^P|A",
+      "learn": "Register says HOW a state operates, not WHAT it is. Optional but disambiguates."
+    },
+    {
+      "term": "State",
+      "category": "Axes",
+      "notation": "^n^D",
+      "definition": "One cell of the 40-state grid (10 Noetics x 4 Domains). Locates a Noetic operation at a specific operational tier.",
+      "example": "^2^P ∈ States",
+      "learn": "State = Noetic x Domain. Add Drive and Register for a State Variant."
+    },
+    {
+      "term": "State Variant",
+      "category": "Axes",
+      "notation": "^n^D_{Fk}|R",
+      "definition": "A richer state with optional Drive and Register annotations.",
+      "example": "^3^P_{F2}|A",
+      "learn": "Use variants when the state needs context beyond Noetic and Domain."
+    },
+    {
+      "term": "Involution Pair",
+      "category": "Principles",
+      "notation": "^n <-> ^m",
+      "definition": "A pair of Noetics that mirror each other structurally: ^2 Positive <-> ^3 Negative, ^5 Female <-> ^6 Male, ^8 Above/Cause <-> ^9 Below/Effect. ^0, ^1, ^4, ^7 are self-dual.",
+      "example": "^2^P / ^3^P",
+      "learn": "Healthy cognition keeps involution pairs in balance; lopsided pairs surface as inversion-axis flags."
+    },
+    {
+      "term": "Inversion",
+      "category": "Principles",
+      "notation": "axis flip",
+      "definition": "The framework operation of flipping an axis to surface its structural opposite. ^2 inverts to ^3; F2 (Wisdom) inverts to F6 (Structure). Inversion reveals what is missing or repressed in a cognitive pattern.",
+      "example": "^2^P -> (inverted) ^3^P",
+      "learn": "Inversion is a probe, not a prescription — it reveals structure rather than recommending the opposite."
+    },
+    {
+      "term": "Noetics",
+      "category": "Built-in Sets",
+      "notation": "Noetics",
+      "definition": "The built-in finite set of all ten Noetic operators.",
+      "example": "|Noetics|",
+      "learn": "Use membership with Noetic symbols: ^2 ∈ Noetics."
+    },
+    {
+      "term": "Domains",
+      "category": "Built-in Sets",
+      "notation": "Domains",
+      "definition": "The built-in finite set {P, C, E, O}.",
+      "example": "Product(Noetics, Domains)",
+      "learn": "Product(Noetics, Domains) builds the 40 state positions."
+    },
+    {
+      "term": "Drives",
+      "category": "Built-in Sets",
+      "notation": "Drives",
+      "definition": "The built-in finite set of F1 through F7.",
+      "example": "F2 ∈ Drives",
+      "learn": "Use Drives for membership claims about F-symbols."
+    },
+    {
+      "term": "Registers",
+      "category": "Built-in Sets",
+      "notation": "Registers",
+      "definition": "The built-in finite set {T, A, f, E}.",
+      "example": "|Registers|",
+      "learn": "The affective register is lowercase |f."
+    },
+    {
+      "term": "States",
+      "category": "Built-in Sets",
+      "notation": "States",
+      "definition": "The built-in finite set of 40 Noetic x Domain state positions.",
+      "example": "|States|",
+      "learn": "States do not replace variants; variants add Drive/Register detail."
+    },
+    {
+      "term": "Foundations",
+      "category": "Built-in Sets",
+      "notation": "Foundations",
+      "definition": "The built-in finite set of seven foundation families.",
+      "example": "|Foundations|",
+      "learn": "Foundations sit above SubFoundations."
+    },
+    {
+      "term": "SubFoundations",
+      "category": "Built-in Sets",
+      "notation": "SubFoundations",
+      "definition": "The built-in finite set of 28 foundation-domain substructures.",
+      "example": "Foundation_1 ⊂ SubFoundations",
+      "learn": "Each foundation family contributes subfoundation members."
+    },
+    {
+      "term": "Empty Set",
+      "category": "Built-in Sets",
+      "notation": "∅ / EmptySet",
+      "definition": "The finite empty meta-set.",
+      "example": "∅ ⊆ Noetics",
+      "learn": "The empty set is a subset of every finite set."
+    },
+    {
+      "term": "Composition / Integration",
+      "category": "Dynamics",
+      "notation": "×",
+      "definition": "Combines compatible CAS structures. Same-Noetic cross-register integration requires a named Ω result.",
+      "example": "(^3^P|A × ^3^P|f × ^3^P|T) = Ω_refusal",
+      "learn": "Use × only when the result is integrated, not merely co-present."
+    },
+    {
+      "term": "Co-Presence",
+      "category": "Dynamics",
+      "notation": "+",
+      "definition": "Marks simultaneous presence without claiming an integrated emergent result.",
+      "example": "^3^P|A + ^3^P|f + ^3^P|T",
+      "learn": "Use + before you can defend a named Ω integration."
+    },
+    {
+      "term": "Division / Contrast",
+      "category": "Dynamics",
+      "notation": "/",
+      "definition": "Compares or separates a state against another state, often useful for involution contrast.",
+      "example": "^2^P / ^3^P",
+      "learn": "Use division to inspect contrast rather than production."
+    },
+    {
+      "term": "Domain Descent",
+      "category": "Dynamics",
+      "notation": "→",
+      "definition": "A directed move from one domain expression toward another.",
+      "example": "^5^P -> ^5^C",
+      "learn": "Read arrows as dependency, descent, or yield depending on context."
+    },
+    {
+      "term": "Fractal Sequence",
+      "category": "Dynamics",
+      "notation": "Phi<...>",
+      "definition": "A sequence of Noetic operators read as a composed cognitive pattern.",
+      "example": "Phi<3:8:5:2>",
+      "learn": "Read the numbers in order, then inspect the composed operator."
+    },
+    {
+      "term": "RPM",
+      "category": "Dynamics",
+      "notation": "RPM(Fk)",
+      "definition": "Prerequisite-chain analysis for a foundation or drive.",
+      "example": "RPM(F5)",
+      "learn": "Use RPM when the question is what must be present first."
+    },
+    {
+      "term": "Recipe",
+      "category": "Production",
+      "notation": "Θ(Ω_name)",
+      "definition": "A production expression defining how a named outcome is generated.",
+      "example": "Θ(Ω_focus) = 0.6·^1^C + 0.4·^7^O → Ω_focus",
+      "learn": "Recipe terms are weighted ingredients that yield a target."
+    },
+    {
+      "term": "Production Target",
+      "category": "Production",
+      "notation": "Ω_name",
+      "definition": "A named emergent output or production result.",
+      "example": "Ω_refusal",
+      "learn": "Use meaningful Ω names for integrated results."
+    },
+    {
+      "term": "Coefficient",
+      "category": "Production",
+      "notation": "0.6·",
+      "definition": "A recipe weight assigned to a prerequisite ingredient.",
+      "example": "0.6·^1^C",
+      "learn": "Weights describe recipe proportions, not absolute truth."
+    },
+    {
+      "term": "Theoretical Yield",
+      "category": "Production",
+      "notation": "Y_T(Ω)",
+      "definition": "The ideal expected yield for a production target.",
+      "example": "Y_T(Ω_focus)",
+      "learn": "Ask Y_T when evaluating expected output."
+    },
+    {
+      "term": "Catalyst",
+      "category": "Production",
+      "notation": "κ_name",
+      "definition": "A factor that helps a recipe proceed without becoming the target itself.",
+      "example": "Θ(Ω_book) | κ_deadline = ...",
+      "learn": "Catalysts change production conditions."
+    },
+    {
+      "term": "Inhibitor",
+      "category": "Production",
+      "notation": "ι_name",
+      "definition": "A factor that suppresses or slows a production recipe.",
+      "example": "Θ(Ω_focus) | ι_noise = ...",
+      "learn": "Use inhibitors for blockers, not missing ingredients."
+    },
+    {
+      "term": "Leakage",
+      "category": "Production",
+      "notation": "Λ_name",
+      "definition": "A side-channel or loss path in production semantics.",
+      "example": "Λ_distraction",
+      "learn": "Use leakage for where production energy goes instead."
+    },
+    {
+      "term": "Membership",
+      "category": "Set Theory",
+      "notation": "∈ / ∉",
+      "definition": "Claims that an object is or is not an element of a typed finite set.",
+      "example": "^2 ∈ Noetics",
+      "learn": "Left side is an object; right side is a meta-set."
+    },
+    {
+      "term": "Subset",
+      "category": "Set Theory",
+      "notation": "⊂ / ⊆",
+      "definition": "Claims one finite meta-set is contained in another.",
+      "example": "NoeticCluster{^2, ^7} ⊆ Noetics",
+      "learn": "Both sides must be meta-sets."
+    },
+    {
+      "term": "Superset",
+      "category": "Set Theory",
+      "notation": "⊃ / ⊇",
+      "definition": "The reverse containment relation: the left set contains the right set.",
+      "example": "Noetics ⊇ NoeticCluster{^2, ^7}",
+      "learn": "Superset diagrams reverse the nesting direction."
+    },
+    {
+      "term": "Union",
+      "category": "Set Theory",
+      "notation": "∪ / Union(A,B)",
+      "definition": "Combines finite typed sets into their combined membership.",
+      "example": "NoeticCluster{^2, ^7} ∪ NoeticCluster{^7, ^8}",
+      "learn": "Union removes duplicate members."
+    },
+    {
+      "term": "Intersection / Pullback",
+      "category": "Set Theory",
+      "notation": "∩ / Pullback(A,B)",
+      "definition": "Finds the common overlap of finite typed sets; Pullback is used here as finite subobject meet.",
+      "example": "Pullback(NoeticCluster{^2, ^7}, NoeticCluster{^7, ^8})",
+      "learn": "This is finite meet behavior, not arbitrary categorical maps."
+    },
+    {
+      "term": "Difference",
+      "category": "Set Theory",
+      "notation": "∖ / Difference(A,B)",
+      "definition": "Keeps members of the left set that are not in the right set.",
+      "example": "Difference(NoeticCluster{^2, ^7}, NoeticCluster{^7, ^8})",
+      "learn": "Read difference left-to-right."
+    },
+    {
+      "term": "Cardinality",
+      "category": "Set Theory",
+      "notation": "|X|",
+      "definition": "Counts the number of elements in a finite meta-set.",
+      "example": "|States|",
+      "learn": "Cardinality applies to sets, not individual Noetics."
+    },
+    {
+      "term": "Noetic Cluster",
+      "category": "Set Theory",
+      "notation": "NoeticCluster{...}",
+      "definition": "A typed finite cluster whose members are Noetic operators.",
+      "example": "NoeticCluster{^2, ^7}",
+      "learn": "Use this when nesting Noetics inside a set-like structure."
+    },
+    {
+      "term": "State Cluster",
+      "category": "Set Theory",
+      "notation": "StateCluster{...}",
+      "definition": "A typed finite cluster whose members are 40-space states.",
+      "example": "StateCluster{^2^P, ^7^O}",
+      "learn": "Use state clusters when domains matter."
+    },
+    {
+      "term": "State Variant Cluster",
+      "category": "Set Theory",
+      "notation": "StateVariantCluster{...}",
+      "definition": "A typed finite cluster whose members can carry Drive and Register annotations.",
+      "example": "StateVariantCluster{^3^P_{F2}|A, ^2^C|f}",
+      "learn": "Use variant clusters for richer annotated states."
+    },
+    {
+      "term": "Relation Cluster",
+      "category": "Set Theory",
+      "notation": "RelationCluster{a → b}",
+      "definition": "A finite typed cluster of directed relation rows.",
+      "example": "RelationCluster{^5^P → ^5^C, ^5^C → ^5^E}",
+      "learn": "Use relation clusters for dependency rows."
+    },
+    {
+      "term": "Coordinate",
+      "category": "Set Theory",
+      "notation": "Coordinate{n,D,F,R}",
+      "definition": "A coordinate tag naming a Noetic, Domain, Drive, and Register position.",
+      "example": "Coordinate{^2, P, F2, A}",
+      "learn": "Coordinates are compact locator tags."
+    },
+    {
+      "term": "Product",
+      "category": "Set Theory",
+      "notation": "Product(A,B)",
+      "definition": "A namespaced finite Cartesian product that avoids collision with CAS integration ×.",
+      "example": "Product(Noetics, Domains)",
+      "learn": "Use Product for set products; use × for CAS integration."
+    },
+    {
+      "term": "Cover",
+      "category": "Set Theory",
+      "notation": "CoverOf(Base, U1...)",
+      "definition": "A validated family of finite subsets whose members cover the base.",
+      "example": "CoverOf(NoeticCluster{^0, ^1, ^2, ^3}, NoeticCluster{^0, ^1}, NoeticCluster{^1, ^2, ^3})",
+      "learn": "Every cover member must be a subset of the base, and the family must cover the base."
+    },
+    {
+      "term": "Partition",
+      "category": "Set Theory",
+      "notation": "PartitionOf(Base, U1...)",
+      "definition": "A validated disjoint cover of a finite base set.",
+      "example": "PartitionOf(NoeticCluster{^0, ^1, ^2, ^3}, NoeticCluster{^0, ^1}, NoeticCluster{^2, ^3})",
+      "learn": "Partitions must cover and not overlap."
+    },
+    {
+      "term": "Diagram Node",
+      "category": "Diagrams",
+      "notation": "node",
+      "definition": "A visual object emitted in the compiler diagram payload.",
+      "example": "artifact.diagram().nodes",
+      "learn": "Nodes represent individual states, symbols, or operators."
+    },
+    {
+      "term": "Diagram Edge",
+      "category": "Diagrams",
+      "notation": "edge",
+      "definition": "A visual relation between diagram nodes or containers.",
+      "example": "source → target",
+      "learn": "Edges carry dependency, membership, subset, or recipe relations."
+    },
+    {
+      "term": "Containment Box",
+      "category": "Diagrams",
+      "notation": "container",
+      "definition": "A diagram container used for sets, clusters, and nesting.",
+      "example": "NoeticCluster{^2, ^7} ⊆ Noetics",
+      "learn": "Containment boxes teach nesting in real time."
+    },
+    {
+      "term": "Grid Layout",
+      "category": "Diagrams",
+      "notation": "grid",
+      "definition": "A diagram layout for finite products such as Noetics x Domains.",
+      "example": "Product(Noetics, Domains)",
+      "learn": "Grid layout is best for Cartesian combinations."
+    },
+    {
+      "term": "Petals Layout",
+      "category": "Diagrams",
+      "notation": "petals",
+      "definition": "A diagram layout for cover and partition families.",
+      "example": "CoverOf(...)",
+      "learn": "Petals show multiple members arranged around a base."
+    },
+    {
+      "term": "Recipe Layout",
+      "category": "Diagrams",
+      "notation": "recipe",
+      "definition": "A dependency diagram for production ingredients and targets.",
+      "example": "Θ(Ω_focus) = ...",
+      "learn": "Recipe diagrams show what feeds the outcome."
+    },
+    {
+      "term": "Rule 4",
+      "category": "Principles",
+      "notation": "operator admissibility",
+      "definition": "The discipline that prevents invalid operator composition and requires named emergent results for certain integrations.",
+      "example": "(^3^P|A × ^3^P|f × ^3^P|T) = Ω_refusal",
+      "learn": "If integration creates a new thing, name the Ω."
+    },
+    {
+      "term": "Object Language",
+      "category": "Principles",
+      "notation": "CAS expressions",
+      "definition": "The core CAS expression layer for states, domains, operators, recipes, and dynamics.",
+      "example": "^5^P -> ^5^C",
+      "learn": "Object-language expressions describe cognitive structure."
+    },
+    {
+      "term": "Meta-Logic",
+      "category": "Principles",
+      "notation": "typed finite set layer",
+      "definition": "The compiler layer for set membership, subset, clusters, products, covers, and finite topos-safe constructs.",
+      "example": "^2 ∈ Noetics",
+      "learn": "Meta-logic talks about CAS objects without replacing them."
+    },
+    {
+      "term": "Topos-Safe",
+      "category": "Principles",
+      "notation": "finite typed constructs",
+      "definition": "A construct admitted because it preserves finite typing, containment, and compiler-checkable semantics.",
+      "example": "Pullback(NoeticCluster{^2, ^7}, NoeticCluster{^7, ^8})",
+      "learn": "Topos-safe features add structure without breaking the framework."
+    },
+    {
+      "term": "Idea",
+      "category": "Noetic Operators",
+      "notation": "^0",
+      "definition": "All things in and outside the Mind. The most basic Noetic primitive — anything that can be thought, perceived, or held in awareness.",
+      "example": "^0 ∈ Noetics",
+      "learn": "\"It's all in your head.\" Self-dual; pair with a Domain to form a state."
+    },
+    {
+      "term": "Mind",
+      "category": "Noetic Operators",
+      "notation": "^1",
+      "definition": "Various degrees of awareness that processes, stores, outputs, and intakes Ideas.",
+      "example": "^1^C",
+      "learn": "\"Paying attention.\" / \"Making up your mind.\" Self-dual operator."
+    },
+    {
+      "term": "Positive",
+      "category": "Noetic Operators",
+      "notation": "^2",
+      "definition": "An Idea the Mind has an affinity for and is attracted toward.",
+      "example": "^2^P",
+      "learn": "\"Drawn to it like a moth to a flame.\" Involution-paired with ^3 Negative."
+    },
+    {
+      "term": "Negative",
+      "category": "Noetic Operators",
+      "notation": "^3",
+      "definition": "An Idea the Mind is adverse to and repelled by. Visceral aversion, not analytical critique.",
+      "example": "^3^P",
+      "learn": "\"Can't stomach it.\" If you mean audit/scrutinize, that is ^6 Male, not ^3."
+    },
+    {
+      "term": "Vibration",
+      "category": "Noetic Operators",
+      "notation": "^4",
+      "definition": "The degree to which an Idea resonates with the Mind, its impression.",
+      "example": "^4^E",
+      "learn": "\"Struck a chord.\" / \"Hit me hard.\" Self-dual operator."
+    },
+    {
+      "term": "Female",
+      "category": "Noetic Operators",
+      "notation": "^5",
+      "definition": "A Mind impregnated with an Idea — the Ideas a Mind is composed of. Encompasses self-image, beliefs, expertise, emotional patterns, trauma and healing — everything we accumulate as experience.",
+      "example": "^5^P",
+      "learn": "\"We are the sum of our experiences.\" ^5 is a substrate against which other Noetics fire."
+    },
+    {
+      "term": "Male",
+      "category": "Noetic Operators",
+      "notation": "^6",
+      "definition": "An Idea impregnated with another Idea — the Ideas an Idea is composed of. Compositional decomposition and structural test.",
+      "example": "^6^C",
+      "learn": "\"Unpacking an idea.\" / \"Breaking it down.\" Involution-paired with ^5 Female."
+    },
+    {
+      "term": "Rhythm",
+      "category": "Noetic Operators",
+      "notation": "^7",
+      "definition": "The rate and pattern a Mind is exposed to an Idea, entraining and conditioning it.",
+      "example": "^7^O",
+      "learn": "\"Practice makes perfect.\" / \"Muscle memory.\" Self-dual operator."
+    },
+    {
+      "term": "Above/Cause",
+      "category": "Noetic Operators",
+      "notation": "^8",
+      "definition": "An Idea that triggers a different Idea than itself to come to Mind. Associative triggering, not deductive reasoning.",
+      "example": "^8^C",
+      "learn": "\"That reminds me...\" If you mean deductive analysis, that is ^6 + ^9, not ^8."
+    },
+    {
+      "term": "Below/Effect",
+      "category": "Noetic Operators",
+      "notation": "^9",
+      "definition": "The Idea brought to Mind by an Above/Cause trigger.",
+      "example": "^9^C",
+      "learn": "\"It just popped into my head.\" Involution-paired with ^8 Above/Cause."
+    },
+    {
+      "term": "Principled",
+      "category": "Domains",
+      "notation": "^P",
+      "definition": "The highest processing tier in CAS. Felt-sense values, identity, vision — the level where principled commitments live.",
+      "example": "^2^P",
+      "learn": "Domain precedence: P > C > E > O. Higher domains anchor lower ones."
+    },
+    {
+      "term": "Cognitive",
+      "category": "Domains",
+      "notation": "^C",
+      "definition": "The thought-and-reasoning tier. Where Ideas are entertained, manipulated, and held in working awareness.",
+      "example": "^1^C",
+      "learn": "Cognitive sits between Principled values above and Evaluative judgment below."
+    },
+    {
+      "term": "Evaluative",
+      "category": "Domains",
+      "notation": "^E",
+      "definition": "The judgment-and-appraisal tier. Where Ideas are weighed, compared, and assessed against criteria.",
+      "example": "^3^E",
+      "learn": "Use Register (|A vs |f) to disambiguate analytical assessment from felt response."
+    },
+    {
+      "term": "Operational",
+      "category": "Domains",
+      "notation": "^O",
+      "definition": "The action-and-execution tier. The lowest tier in the precedence order; where intention becomes behavior.",
+      "example": "^7^O",
+      "learn": "Operational feeds back to Principled (O -> P) closing the loop."
+    },
+    {
+      "term": "Unity",
+      "category": "Drives",
+      "notation": "F1",
+      "definition": "The drive toward integration, wholeness, belonging — the sense that parts cohere into a larger whole. Inversion-paired with F7 Purpose.",
+      "example": "F1 ∈ Drives",
+      "learn": "F1 <-> F7 inversion: integration vs directionality."
+    },
+    {
+      "term": "Wisdom",
+      "category": "Drives",
+      "notation": "F2",
+      "definition": "The drive toward understanding, insight, discernment — knowing how things actually are. Inversion-paired with F6 Structure.",
+      "example": "^2^P_{F2}",
+      "learn": "F2 <-> F6 inversion: discerning truth vs imposing form."
+    },
+    {
+      "term": "Vitality",
+      "category": "Drives",
+      "notation": "F3",
+      "definition": "The drive toward life, energy, generativity — being alive and productive. Inversion-paired with F5 Agency.",
+      "example": "F3 ∈ Drives",
+      "learn": "F3 <-> F5 inversion: aliveness vs willed action."
+    },
+    {
+      "term": "Connection",
+      "category": "Drives",
+      "notation": "F4",
+      "definition": "The drive toward relationship, attachment, communion. Self-dual: F4 inverts to itself.",
+      "example": "F4 ∈ Drives",
+      "learn": "F4 is the only self-dual Drive — connection has no structural opposite."
+    },
+    {
+      "term": "Agency",
+      "category": "Drives",
+      "notation": "F5",
+      "definition": "The drive toward willed action, self-determination, capability. Inversion-paired with F3 Vitality.",
+      "example": "RPM(F5)",
+      "learn": "F5 <-> F3 inversion: chosen action vs spontaneous aliveness."
+    },
+    {
+      "term": "Structure",
+      "category": "Drives",
+      "notation": "F6",
+      "definition": "The drive toward order, form, predictability — making things hold together reliably. Inversion-paired with F2 Wisdom.",
+      "example": "F6 ∈ Drives",
+      "learn": "F6 <-> F2 inversion: imposing order vs discerning truth."
+    },
+    {
+      "term": "Purpose",
+      "category": "Drives",
+      "notation": "F7",
+      "definition": "The drive toward meaning, direction, telos — what it is all for. Inversion-paired with F1 Unity.",
+      "example": "^8^P_{F7}",
+      "learn": "F7 <-> F1 inversion: directional aim vs integrative wholeness."
+    },
+    {
+      "term": "Transcendent",
+      "category": "Registers",
+      "notation": "|T",
+      "definition": "A high-abstraction, purpose-orienting operational character. Felt sense of meaning, vision, calling — integrative across particulars.",
+      "example": "^2^P|T",
+      "learn": "Register specifies HOW a state operates, not WHAT it is."
+    },
+    {
+      "term": "Analytical",
+      "category": "Registers",
+      "notation": "|A",
+      "definition": "An explicit, sequential, logical, reason-based operational character. Conscious deliberation; chain-of-thought; symbolic reasoning.",
+      "example": "^3^P|A",
+      "learn": "|A is the register of explicit reasoning."
+    },
+    {
+      "term": "Affective",
+      "category": "Registers",
+      "notation": "|f",
+      "definition": "A value-laden, feeling-toned operational character. Emotional response, visceral reaction, RLHF-tuned preference expression.",
+      "example": "^3^P|f",
+      "learn": "Lowercase |f. Distinct from |A: same Noetic, different operational character."
+    },
+    {
+      "term": "Embodied",
+      "category": "Registers",
+      "notation": "|E",
+      "definition": "A sensorimotor, concrete operational character — direct engagement with material substrate. Bodily knowing, gut response, real-time control loops.",
+      "example": "^7^O|E",
+      "learn": "Uppercase |E (embodied register), distinct from ^E (Evaluative domain)."
+    },
+    {
+      "term": "Nesting analysis",
+      "category": "Latest nesting",
+      "notation": "f ∘ g",
+      "definition": "The first written thought is innermost; the last governs. The compiler emits separate canonical readings, a cancellation criterion, orbit class and unresolved questions.",
+      "example": "^8^C ∘ ^9^C",
+      "learn": "Read cas.nesting/0.2 fields. Do not replace a NOT_DECIDED_BY_THE_BOOK result with a confident class."
+    },
+    {
+      "term": "File module",
+      "category": "Language workflow",
+      "notation": "use \"helpers.cas\"",
+      "definition": "Import a local CAS file relative to the file being compiled. Explicit exports limit the imported names.",
+      "example": "python cas.py --file main.cas",
+      "learn": "Use --file or :load so the compiler knows the source directory. File source is passed unchanged."
+    },
+    {
+      "term": "Compiler backend",
+      "category": "Language workflow",
+      "notation": "--backend python | native",
+      "definition": "Python is the bundled diagram-capable dialect. Native is an explicitly supplied casc executable with its own supported grammar.",
+      "example": "python cas.py --capabilities",
+      "learn": "The two compilers are not interchangeable. Native does not emit diagrams."
+    },
+    {
+      "term": "Symbolic yield",
+      "category": "Language workflow",
+      "notation": "Y_T(Omega_focus)",
+      "definition": "An unevaluated production query represented by the compiler.",
+      "example": "Y_T(Omega_focus)",
+      "learn": "A valid query is not a computed numeric yield."
+    },
+    {
+      "term": "CAS-Ohm",
+      "category": "CAS-Ohm arithmetic",
+      "notation": "ohm_flow(drive, constraint)",
+      "definition": "Exact declared-scale calculations: attention flow = drive/constraint, required drive = attention*constraint, effective constraint = drive/attention.",
+      "example": "python cas.py --file examples/ohm_flow.cas --json",
+      "learn": "Declare units, origin and reference. Zero denominators and mismatched scales are errors. Inverting a ratio is not causal identification or independent validation."
+    },
+    {
+      "term": "PCBA / CCDL",
+      "category": "Cognitive circuit structure",
+      "notation": "--language ccdl",
+      "definition": "A bounded implementation of the book's declarative Cognitive Circuit Description Language. Typed components and nets describe a circuit or multilayer board.",
+      "example": "python cas.py --language ccdl --grammar",
+      "learn": "Compile a supported CCDL file with --file. Inspect diagnostics, checked wiring and validation_limits. Default compilation performs structural checks; numeric execution requires --simulate and an explicit supported profile."
+    },
+    {
+      "term": "PCBA numeric simulation",
+      "category": "Cognitive circuit design",
+      "notation": "--simulate --inputs REQUEST.json --steps N",
+      "definition": "Execute an explicitly selected, bounded numeric design profile against a CCDL board, producing component operations, state snapshots, outputs and probe traces.",
+      "example": "python cas.py --language ccdl --file examples/simulation/cascade.ccdl --simulate --inputs examples/simulation/cascade.inputs.json --steps 4 --trace trace.json",
+      "learn": "Read SIMULATION.md. Fixed-bias scalar CJTs are an idealized tutorial model; CAS-Ohm resistor calculations use declared scales. Neither verifies human cognition. Unsupported dynamics fail clearly."
+    }
+  ],
+  "learning": [
+    {
+      "title": "1. Read The Axes",
+      "goal": "Learn Noetic, Domain, Drive, and Register as the four main coordinates.",
+      "terms": "Noetic, Domain, Drive, Register, State",
+      "practice": "^2^C_{F2}|T"
+    },
+    {
+      "title": "2. Compare Dynamics",
+      "goal": "Distinguish co-presence, domain descent, contrast, and integration.",
+      "terms": "Co-Presence, Domain Descent, Division / Contrast, Composition / Integration",
+      "practice": "^3^P|A + ^3^P|f + ^3^P|T"
+    },
+    {
+      "title": "3. Name Emergence",
+      "goal": "Use Ω when multiple signals integrate into a named result.",
+      "terms": "Rule 4, Production Target, Register",
+      "practice": "(^3^P|A × ^3^P|f × ^3^P|T) = Ω_refusal"
+    },
+    {
+      "title": "4. Read Recipes",
+      "goal": "Understand Θ, coefficients, catalysts, and yield queries.",
+      "terms": "Recipe, Coefficient, Catalyst, Theoretical Yield",
+      "practice": "Θ(Ω_focus) = 0.6·^1^C + 0.4·^7^O → Ω_focus"
+    },
+    {
+      "title": "5. Use Typed Meta-Logic",
+      "goal": "Separate CAS objects from finite sets that contain or relate them.",
+      "terms": "Meta-Logic, Membership, Subset, Noetic Cluster, State Cluster",
+      "practice": "NoeticCluster{^2, ^7} ⊆ Noetics"
+    },
+    {
+      "title": "6. Read Diagrams",
+      "goal": "Use compiler diagrams to see nodes, edges, containment, products, and recipes.",
+      "terms": "Diagram Node, Diagram Edge, Containment Box, Grid Layout, Recipe Layout",
+      "practice": "Product(Noetics, Domains)"
+    }
+  ]
+}

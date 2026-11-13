@@ -1,0 +1,8 @@
+.cas-inspector .cas-structural-label{margin:0 0 4px;font-weight:700;color:#dbeafe}
+.cas-inspector .cas-face-explanation,.cas-inspector .cas-structural-role,.cas-inspector .cas-structure-boundary{margin-top:8px;font-size:12px;line-height:1.5;color:#c0d4ca}
+.cas-inspector .cas-authored-annotation{margin-top:12px;border-left:3px solid #5eead4;padding:10px;background:#14221e;border-radius:0 6px 6px 0}
+.cas-inspector .cas-annotation-heading{margin:0 0 6px;color:#99f6e4;font:700 13px/1.4 system-ui}
+.cas-inspector .cas-annotation-source,.cas-inspector .cas-annotation-boundary{font-size:12px;line-height:1.5;color:#c0d4ca}
+.cas-inspector .cas-annotation-phrase{margin:8px 0;font:14px/1.6 system-ui;overflow-wrap:anywhere}
+.cas-inspector .cas-face-grid>section{min-width:0}
+@media(max-width:550px){.cas-inspector .cas-face-grid{grid-template-columns:1fr}.cas-inspector{padding:12px}}

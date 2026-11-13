@@ -1,0 +1,13 @@
+{
+  "profile": "cas.pcba.ohm-resistor/0.1",
+  "scale": {"id": "ohm-independent-design-v1", "drive_unit": "declared-drive", "attention_unit": "declared-attention"},
+  "input_bindings": {"supply_a": "rail_a", "supply_b": "rail_b"},
+  "output_bindings": {"flow_a": "rail_a", "flow_b": "rail_b"},
+  "initial_state": {},
+  "schedule": [
+    {
+      "supply_a": {"quantity": "drive", "value": "9", "origin": "design", "reference": "fixture:path-a"},
+      "supply_b": {"quantity": "drive", "value": "1", "origin": "design", "reference": "fixture:path-b"}
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+// The two named nets remain independent even though their state types match.
+circuit ohm_independent {
+    input: supply_a, supply_b;
+    output: flow_a, flow_b;
+    node rail_a: ^8^C_{F5}|A;
+    node rail_b: ^8^C_{F5}|A;
+    resistor r_b: Resistor< rail_b, R=3 >;
+    resistor r_a: Resistor< rail_a, R=30 >;
+    probe tp_a: rail_a;
+    probe tp_b: rail_b;
+}

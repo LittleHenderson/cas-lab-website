@@ -1,0 +1,518 @@
+Programming in CAS - Corrected edition - 11 October 2026 UTC
+Exact compiler examples. Public Python implementation.
+Copy the line(s) between SOURCE and END SOURCE for one case.
+Recipe source is ONE LINE: PDF wraps are display only.
+Application timelines/API sketches in the book are pseudocode.
+Coefficients and human interpretations are authored, not measurements.
+
+pattern-decomposition
+Expected: accepted
+
+SOURCE
+^6^C_{F2}|A
+END SOURCE
+
+pattern-insight
+Expected: accepted
+
+SOURCE
+^9^C_{F2}|T
+END SOURCE
+
+prototype-triggered-step
+Expected: accepted
+
+SOURCE
+^9^O_{F5}|E
+END SOURCE
+
+prototype-practice
+Expected: accepted
+
+SOURCE
+^7^O_{F5}|E
+END SOURCE
+
+research-association
+Expected: accepted
+
+SOURCE
+^8^C_{F2}|A
+END SOURCE
+
+friend-resonance
+Expected: accepted
+
+SOURCE
+^4^E_{F4}|f
+END SOURCE
+
+architect-copresence
+Expected: accepted
+
+SOURCE
+^6^O_{F6}|A + ^4^E_{F7}|f
+END SOURCE
+
+monoid-arithmetic
+Expected: accepted
+
+SOURCE
+^8^C_{F6} * ^5^C_{F6}
+END SOURCE
+
+resonance-to-examination
+Expected: accepted
+
+SOURCE
+^4^C_{F1} -> ^6^E_{F1}
+END SOURCE
+
+presence-bind
+Expected: accepted
+
+SOURCE
+(^1^P_{F3}|E * ^1^P_{F5}|A) = ^1^P|Omega_presence
+END SOURCE
+
+focused-refusal-recipe
+Expected: accepted
+
+SOURCE
+Theta(Omega_focused_refusal) = 0.53*^1^P_{F7}|T + 2.11*^3^P_{F2}|A + 1.04*^1^P_{F1}|A -> Omega_focused_refusal
+END SOURCE
+
+operator-phi
+Expected: accepted
+
+SOURCE
+Phi<1:4:8>
+END SOURCE
+
+unsupported-caret-phi
+Expected: rejected
+
+SOURCE
+Phi< ^1, ^4, ^8 >
+END SOURCE
+Expected diagnostic: parsing@5: expected NUMBER, got NOETIC
+
+spreadsheet-decomposition
+Expected: accepted
+
+SOURCE
+^6^C_{F6}|A
+END SOURCE
+
+coding-and-podcast
+Expected: accepted
+
+SOURCE
+^6^C_{F5}|A + ^4^E_{F4}|f
+END SOURCE
+
+ethical-cue-to-action
+Expected: accepted
+
+SOURCE
+^8^P_{F1}|T -> ^9^O_{F5}|E
+END SOURCE
+
+methodical-review-recipe
+Expected: accepted
+
+SOURCE
+Theta(Omega_methodical_review) = 2.0*^6^C_{F2}|A + 1.5*^1^C_{F6}|A + 0.5*^1^P_{F7}|A -> Omega_methodical_review
+END SOURCE
+
+optional-register
+Expected: accepted
+
+SOURCE
+^1^E_{F1}
+END SOURCE
+
+optional-drive
+Expected: accepted
+
+SOURCE
+^9^P|A
+END SOURCE
+
+default-domain
+Expected: accepted
+
+SOURCE
+^9_{F2}
+END SOURCE
+
+legacy-spelling
+Expected: accepted
+
+SOURCE
+CO-4^O + CO-4^E
+END SOURCE
+
+invalid-register
+Expected: rejected
+
+SOURCE
+^4^C_{F3}|Q
+END SOURCE
+Expected diagnostic: parsing@9: invalid register 'Q': CAS v7.5 Phenomenological Register must be one of {T, A, f, E} (lowercase f is authoritative for Affective)
+
+evaluation-cues-step
+Expected: accepted
+
+SOURCE
+^8^E_{F3}|E -> ^9^O_{F5}|E
+END SOURCE
+
+invalid-recipe-exercise
+Expected: rejected
+
+SOURCE
+Theta(Omega_joy) = ^8_E_{F3} + ^4_E_{F4}
+END SOURCE
+Expected diagnostic: parsing@19: CAS v7.6 recipe prerequisite: expected numeric coefficient, got NOETIC
+
+grammar-recipe
+Expected: accepted
+
+SOURCE
+Theta(Omega_name) = 1.0*^1^E + 2.0*^2^C -> Omega_name
+END SOURCE
+
+invalid-drive
+Expected: rejected
+
+SOURCE
+^1^P_{F8}
+END SOURCE
+Expected diagnostic: typecheck: drive number must be 1-7, got F8
+
+downward-jump
+Expected: accepted
+
+SOURCE
+^8^P -> ^9^O
+END SOURCE
+
+upward-rejection
+Expected: rejected
+
+SOURCE
+^1^O -> ^1^P
+END SOURCE
+Expected diagnostic: typecheck: domain descent violated: O cannot descend to P
+
+three-register-copresence
+Expected: accepted
+
+SOURCE
+^4^O_{F4}|A + ^4^O_{F4}|f + ^4^O_{F4}|E
+END SOURCE
+
+cross-domain-product
+Expected: accepted
+
+SOURCE
+^8^C * ^5^E
+END SOURCE
+
+descent-edge-collection
+Expected: accepted
+
+SOURCE
+RelationCluster{^2^P -> ^3^C, ^3^C -> ^4^E, ^4^E -> ^5^O}
+END SOURCE
+
+invalid-arrow-chain
+Expected: rejected
+
+SOURCE
+^2^P -> ^3^C -> ^4^E
+END SOURCE
+Expected diagnostic: typecheck: ARROW requires state-typed operands (got relation)
+
+launch-alice
+Expected: accepted
+
+SOURCE
+^3^E_{F4}|f
+END SOURCE
+
+launch-bob
+Expected: accepted
+
+SOURCE
+^9^O_{F5}|A
+END SOURCE
+
+tutor-explanation
+Expected: accepted
+
+SOURCE
+^6^C_{F2}|A
+END SOURCE
+
+tutor-rejection
+Expected: accepted
+
+SOURCE
+^3^E_{F5}|f
+END SOURCE
+
+garage-resonance
+Expected: accepted
+
+SOURCE
+^4^E_{F6}|f
+END SOURCE
+
+review-copresence
+Expected: accepted
+
+SOURCE
+^1^P_{F7}|T + ^6^C_{F6}|A + ^4^E_{F4}|f
+END SOURCE
+
+rpm-agency
+Expected: accepted
+
+SOURCE
+RPM(F5)
+END SOURCE
+
+anxious-operator-sequence
+Expected: accepted
+
+SOURCE
+Phi<7:4:6>
+END SOURCE
+
+finite-set-difference
+Expected: accepted
+
+SOURCE
+Difference(StateCluster{^8^C, ^1^C, ^0^P}, StateCluster{^0^P, ^8^C})
+END SOURCE
+
+triggered-execution-bindings
+Expected: accepted
+
+SOURCE
+let core_purpose = ^8^P_{F7}|T; let execution = ^9^O_{F5}|A; let transition = core_purpose -> execution;
+END SOURCE
+
+creative-operators
+Expected: accepted
+
+SOURCE
+Phi<8:9:6>
+END SOURCE
+
+debugging-structure
+Expected: accepted
+
+SOURCE
+^6^C_{F6}|A
+END SOURCE
+
+rack-structure
+Expected: accepted
+
+SOURCE
+^6^O_{F6}|E
+END SOURCE
+
+meeting-aversion
+Expected: accepted
+
+SOURCE
+^3^E_{F6}|f
+END SOURCE
+
+ethical-boundary
+Expected: accepted
+
+SOURCE
+^3^P_{F1}|T
+END SOURCE
+
+task-list-decomposition
+Expected: accepted
+
+SOURCE
+^6^C_{F5}|A
+END SOURCE
+
+reasoning-operators
+Expected: accepted
+
+SOURCE
+Phi<8:6:9>
+END SOURCE
+
+deployment-affective-decomposition
+Expected: accepted
+
+SOURCE
+^6^C_{F6}|f
+END SOURCE
+
+deployment-aversion
+Expected: accepted
+
+SOURCE
+^3^E_{F6}|f
+END SOURCE
+
+clarifying-attention
+Expected: accepted
+
+SOURCE
+^1^C_{F2}|A
+END SOURCE
+
+nested-operators
+Expected: accepted
+
+SOURCE
+Phi<6:8:9>
+END SOURCE
+
+review-targets
+Expected: accepted
+
+SOURCE
+StateCluster{^4^E, ^6^P}
+END SOURCE
+
+ethical-agent
+Expected: accepted
+
+SOURCE
+^3^P_{F1}|T
+END SOURCE
+
+operational-agent
+Expected: accepted
+
+SOURCE
+^2^O_{F5}|A
+END SOURCE
+
+legacy-operator-order
+Expected: accepted
+
+SOURCE
+Phi<3:5:3:7>
+END SOURCE
+
+clinical-low-vitality-recipe
+Expected: accepted
+Enter as one line. PDF line wraps are display only. Coefficients are illustrative.
+SOURCE
+Theta(Omega_MDD_structural) = 2.4 * ^3^E_{F3}|f + 1.9 * ^7^C_{F2}|A + 1.7 * ^7^O_{F3}|E + 1.5 * ^7^E_{F3}|f + 1.2 * ^3^E_{F7}|f + 0.8 * ^5^E_{F4}|f -> Omega_MDD_structural
+END SOURCE
+Author-selected ingredients (not executable comments):
+2.4 * ^3^E_{F3}|f // aversion toward vitality
++ 1.9 * ^7^C_{F2}|A // recurring narrow thought
++ 1.7 * ^7^O_{F3}|E // repeated low-activity routine
++ 1.5 * ^7^E_{F3}|f // recurrence of low feeling
++ 1.2 * ^3^E_{F7}|f // aversion toward purpose/effort
++ 0.8 * ^5^E_{F4}|f // accumulated relational defeat
+
+clinical-worry-recipe
+Expected: accepted
+Enter as one line. PDF line wraps are display only. Coefficients are illustrative.
+SOURCE
+Theta(Omega_GAD_structural) = 2.6 * ^8^C_{F3}|A + 2.2 * ^6^C_{F6}|A + 1.6 * ^7^C_{F3}|A + 1.2 * ^7^O_{F3}|E + 0.9 * ^3^E_{F1}|f -> Omega_GAD_structural
+END SOURCE
+Author-selected ingredients (not executable comments):
+2.6 * ^8^C_{F3}|A // one concern cues another threat
++ 2.2 * ^6^C_{F6}|A // examine stability criteria
++ 1.6 * ^7^C_{F3}|A // repeated mental checking
++ 1.2 * ^7^O_{F3}|E // repeated bodily checking
++ 0.9 * ^3^E_{F1}|f // aversion toward uncertainty
+
+clinical-trauma-recipe
+Expected: accepted
+Enter as one line. PDF line wraps are display only. Coefficients are illustrative.
+SOURCE
+Theta(Omega_PTSD_structural) = 2.8 * ^7^E_{F3}|f + 2.3 * ^3^O_{F1}|E + 2.0 * ^5^E_{F3}|f + 1.7 * ^5^P_{F1}|T + 1.3 * ^6^C_{F2}|A -> Omega_PTSD_structural
+END SOURCE
+Author-selected ingredients (not executable comments):
+2.8 * ^7^E_{F3}|f // recurrence of threat-related feeling
++ 2.3 * ^3^O_{F1}|E // embodied avoidance/recoil
++ 2.0 * ^5^E_{F3}|f // accumulated threat experience
++ 1.7 * ^5^P_{F1}|T // accumulated world-safety beliefs
++ 1.3 * ^6^C_{F2}|A // examine causes and components
+
+clinical-project-activity-recipe
+Expected: accepted
+Enter as one line. PDF line wraps are display only. Coefficients are illustrative.
+SOURCE
+Theta(Omega_manic_structural) = 2.5 * ^8^C_{F5}|T + 2.2 * ^7^O_{F5}|E + 1.8 * ^4^P_{F7}|T + 1.5 * ^2^E_{F3}|f + 1.1 * ^3^E_{F6}|f -> Omega_manic_structural
+END SOURCE
+Author-selected ingredients (not executable comments):
+2.5 * ^8^C_{F5}|T // one project Idea cues another
++ 2.2 * ^7^O_{F5}|E // repeated high-tempo activity
++ 1.8 * ^4^P_{F7}|T // resonance with a purpose Idea
++ 1.5 * ^2^E_{F3}|f // attraction toward vitality
++ 1.1 * ^3^E_{F6}|f // aversion toward limits
+
+clinical-authored-contrast-recipe
+Expected: accepted
+Enter as one line. PDF line wraps are display only. Coefficients are illustrative.
+SOURCE
+Theta(Omega_alternative) = 2.2 * ^2^E_{F3}|f + 1.9 * ^9^C_{F2}|T + 1.7 * ^9^O_{F5}|E + 1.5 * ^4^P_{F7}|T -> Omega_alternative
+END SOURCE
+Author-selected ingredients (not executable comments):
+2.2 * ^2^E_{F3}|f // attraction toward vitality
++ 1.9 * ^9^C_{F2}|T // discussion cues an insight Idea
++ 1.7 * ^9^O_{F5}|E // agreed cue prompts an action Idea
++ 1.5 * ^4^P_{F7}|T // resonance with a purpose Idea
+
+marketing-persona-recipe
+Expected: accepted
+Enter as one line. PDF line wraps are display only. Coefficients are illustrative.
+SOURCE
+Theta(Omega_aspirational_professional) = 2.1 * ^2^E_{F6}|f + 1.8 * ^6^C_{F2}|A + 1.6 * ^6^E_{F7}|T + 1.3 * ^3^E_{F5}|f + 1.0 * ^4^E_{F4}|f -> Omega_aspirational_professional
+END SOURCE
+Author-selected ingredients (not executable comments):
+2.1 * ^2^E_{F6}|f // attraction toward status
++ 1.8 * ^6^C_{F2}|A // examine product information
++ 1.6 * ^6^E_{F7}|T // examine future-purpose criteria
++ 1.3 * ^3^E_{F5}|f // aversion toward unaffordable cost
++ 1.0 * ^4^E_{F4}|f // resonance with peers
+
+appendix-refusal
+Expected: accepted
+
+SOURCE
+Theta(Omega_refusal) = 0.53*^1^P_{F7}|T + 2.11*^3^P_{F2}|A -> Omega_refusal
+END SOURCE
+
+appendix-state-collection
+Expected: accepted
+
+SOURCE
+StateCluster{^1^P, ^4^C}
+END SOURCE
+
+appendix-relation-collection
+Expected: accepted
+
+SOURCE
+RelationCluster{^4^C -> ^6^E, ^6^E -> ^7^O}
+END SOURCE
+
+invalid-domain
+Expected: rejected
+
+SOURCE
+^1^Q
+END SOURCE
+Expected diagnostic: parsing@3: expected DOMAIN, got IDENT

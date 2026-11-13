@@ -1,0 +1,4 @@
+let scale: ohm_scale = ohm_scale("example-v1", "declared-drive", "declared-attention")
+let desired_flow: ohm_attention = ohm_attention("3", scale, "design", "example:desired-flow")
+let resistance: ohm_constraint = ohm_constraint("4", scale, "design", "example:constraint")
+ohm_required_drive(desired_flow, resistance)

@@ -1,0 +1,157 @@
+"""Strict stdlib component checks for the bounded standalone CCDL frontend.
+
+Authority: CAS PCBA Engineer, Appendix C (SHA256
+452d64308f860b1c0e5b6c3f4d9c8a91760822baa9b9fcd1a6e12a4797983d8f),
+sections C.4-C.6. Adapted from the research pcba_component_adapter.py,
+SHA256 9b9f72b67c7d2d3c6dbfd553e709ff1539632d930ecb7da73b15d65525782edd.
+No historical code loading, Pydantic, trading imports, or execution semantics.
+"""
+from __future__ import annotations
+
+from fractions import Fraction
+import math
+import re
+
+from .pcba_reader import PcbaParseError, _Reader
+
+AUTHORITY_SOURCE = {
+    "path": "book/CAS_PCBA_Engineer/Appendix_C_CCDL_Language_Reference.md",
+    "sha256": "452d64308f860b1c0e5b6c3f4d9c8a91760822baa9b9fcd1a6e12a4797983d8f",
+    "sections": ["Statements: Nodes, CJTs, Feedback, Probes", "Component Declarations", "CJT Parameter Block Grammar"],
+}
+CALIBRATION_SOURCE = {
+    "path": "book/CAS_PCBA_Engineer/Appendix_I_CAS_Ohm_Measurement_and_Calibration.md",
+    "sha256": "5be5667eb9b37460a7b7c2f9c21ca664582445f54136c0cb0a87cec6dd98de60",
+    "rule": "Component resistance R is on the 0..100 scale; normalized readings do not select the scale implicitly.",
+}
+SUPPORTED_COMPONENTS = frozenset({"CJT", "Resistor", "Capacitor", "Inductor", "Diode", "Transformer"})
+MAX_EXPRESSION_CHARS = 16384
+MAX_NUMBER_CHARS = 512
+_NUMBER = re.compile(r"-?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)\Z")
+_IDENT = re.compile(r"[A-Za-z][A-Za-z0-9_]*\Z")
+_ALIASES = {"β": "beta", "b": "beta", "rpi": "rπ"}
+
+
+class ComponentError(ValueError):
+    def __init__(self, code: str, message: str):
+        self.code, self.message = code, message
+        super().__init__(message)
+
+
+def source_files() -> list[dict]:
+    """Describe local static dependencies, without discovery or source loading."""
+    return [{"path": "api/notation/pcba_reader.py", "use": "bounded stdlib CCDL tokenizer/parser"},
+            {"path": "api/notation/pcba_components.py", "use": "component parameter and terminal checks"}]
+
+
+def _number(key: str, raw: str) -> tuple[int | float | str, Fraction]:
+    if len(raw) > MAX_NUMBER_CHARS:
+        raise ComponentError("E-COMP-LIMIT", f"Parameter {key} exceeds the 512-character decimal limit")
+    if not _NUMBER.fullmatch(raw):
+        raise ComponentError("E-COMP-PARAM", f"Parameter {key} requires a finite decimal number (no exponent or unit)")
+    exact = Fraction(raw)
+    if "." not in raw:
+        return int(raw), exact
+    number = float(raw)
+    # The exact literal remains authoritative. Avoid inventing zero/infinity
+    # when a valid bounded decimal cannot be represented by a binary float.
+    return (number if math.isfinite(number) and (number != 0 or exact == 0) else raw), exact
+
+
+def _reference(raw: str, *, domain: bool = False) -> str:
+    if domain:
+        if re.fullmatch(r"\^[PCEO]", raw):
+            return raw
+        raise ComponentError("E-COMP-TERMINAL", "Diode/Transformer endpoints must be bare domains (^P, ^C, ^E, ^O)")
+    if _IDENT.fullmatch(raw) or (raw.startswith("^") and not re.fullmatch(r"\^[PCEO]", raw)):
+        return raw
+    raise ComponentError("E-COMP-TERMINAL", "Expected one named net or complete CAS state, without a property/index reference")
+
+
+def _normalize_parameters(raw: dict[str, str], aliases: bool) -> dict[str, str]:
+    result = {}
+    for key, value in raw.items():
+        name = _ALIASES.get(key, key) if aliases else key
+        if name in result:
+            raise ComponentError("E-COMP-DUPLICATE", f"Duplicate parameter after alias normalization: {name}")
+        result[name] = value
+    return result
+
+
+def parse_component(expression: str) -> dict:
+    """Parse one canonical Type<...> expression; resolve board names separately."""
+    if not isinstance(expression, str) or not expression.strip():
+        raise ComponentError("E-COMP-SYNTAX", "Component expression must be nonempty text")
+    if len(expression) > MAX_EXPRESSION_CHARS:
+        raise ComponentError("E-COMP-LIMIT", "Component expression exceeds 16384 characters")
+    try:
+        reader = _Reader(expression)
+        type_name = reader.take().text
+        if type_name not in SUPPORTED_COMPONENTS:
+            raise ComponentError("E-PCBA-NOT-SUPPORTED", f"Component {type_name!r} is not in the implemented static subset")
+        reader.enter("<")
+        parameters = {}
+        terminals = {}
+        if type_name == "CJT":
+            terminals["cause"] = _reference(reader.reference())
+            if reader.token.text != "|":
+                raise ComponentError("E-CJT-001", "CJT requires cause | bias => effect")
+            reader.take("|")
+            if reader.token.text == "=>":
+                raise ComponentError("E-CJT-001", "CJT bias terminal is required")
+            terminals["bias"] = _reference(reader.reference())
+            reader.take("=>")
+            terminals["effect"] = _reference(reader.reference())
+        elif type_name in {"Diode", "Transformer"}:
+            terminals["source"] = _reference(reader.reference(), domain=True)
+            reader.take("->")
+            terminals["target"] = _reference(reader.reference(), domain=True)
+        else:
+            terminals["state"] = _reference(reader.reference())
+        if type_name != "CJT":
+            while reader.token.text == ",":
+                reader.take(",")
+                reader.assignment(parameters)
+        reader.leave(">")
+        reader.parameters(parameters)
+        if reader.token.kind != "EOF":
+            raise ComponentError("E-COMP-SYNTAX", "Unexpected text after component expression")
+    except PcbaParseError as error:
+        raise ComponentError(error.code, error.message) from error
+    raw = _normalize_parameters(parameters, type_name == "CJT")
+    if type_name == "CJT":
+        allowed = {"beta", "sat", "cutoff", "region", "gm", "rπ"}
+        defaults = {"beta": "1.0", "sat": "0.95", "cutoff": "0.1", "region": "active"}
+        required = None
+    else:
+        required = {"Resistor": "R", "Capacitor": "C", "Inductor": "L", "Transformer": "ratio"}.get(type_name)
+        allowed = {required} if required else set()
+        if type_name == "Capacitor":
+            allowed.add("leakage")
+        defaults = {}
+    if set(raw) - allowed:
+        raise ComponentError("E-COMP-PARAM", f"Unknown {type_name} parameter: {sorted(set(raw) - allowed)[0]}")
+    if required and required not in raw:
+        raise ComponentError("E-COMP-PARAM", f"Missing {type_name} parameter: {required}")
+    literals = {**defaults, **raw}
+    values, exact = {}, {}
+    for key, value in literals.items():
+        if key == "region":
+            if value not in {"active", "cutoff", "saturation", "breakdown"}:
+                raise ComponentError("E-COMP-PARAM", "Invalid intended CJT region")
+            values[key] = value
+        else:
+            values[key], exact[key] = _number(key, value)
+    if any(value < 0 for value in exact.values()):
+        raise ComponentError("E-COMP-PARAM", f"{type_name} numeric parameters must be nonnegative")
+    if type_name == "CJT" and not 0 <= exact["cutoff"] < exact["sat"] <= 1:
+        raise ComponentError("E-COMP-PARAM", "CJT requires 0 <= cutoff < sat <= 1")
+    if type_name == "Transformer" and exact["ratio"] <= 0:
+        raise ComponentError("E-COMP-PARAM", "Transformer ratio must be positive")
+    if type_name == "Resistor" and exact["R"] > 100:
+        raise ComponentError("E-COMP-PARAM", "Resistor R must be on the component scale [0,100] (Appendix I)")
+    if "leakage" in exact and exact["leakage"] > 1:
+        raise ComponentError("E-COMP-PARAM", "Capacitor leakage must be in [0,1]")
+    return {"type": type_name, "kind": type_name.lower(), "parameters": values,
+            "parameter_literals": literals, "terminals": terminals,
+            "complete": True, "diagnostics": []}

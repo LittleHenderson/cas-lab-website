@@ -1,0 +1,14 @@
+.optional-tool { margin: 18px 0; padding: 16px 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); min-width: 0; }
+.optional-tool > summary { min-height: 28px; color: var(--mint); }
+.optional-tool > p { color: var(--muted); font-size: .9rem; }
+.optional-tool > div { margin-top: 14px; min-width: 0; }
+.optional-tool .cas-inversion { max-width: none; }
+.inspection-load-controls { display: flex; flex-wrap: wrap; gap: 10px; }
+.inspection-load-controls button { min-height: 44px; }
+/* Keep the embedded document independent of the Site's global header/code rules. */
+.optional-tool .rpa-inspector header { display: block; padding: 0; border: 0; margin: 0; }
+.optional-tool .rpa-inspector code { color: inherit; }
+.optional-tool .rpa-inspector nav { display: block; }
+@media(max-width:480px) { .optional-tool { padding: 12px; } }
+
+.rpa-guide{scroll-margin-top:24px;padding:clamp(18px,3vw,36px)}.rpa-guide > summary{font-size:1.08rem}.rpa-guide h2{font-size:clamp(1.5rem,3vw,2.3rem);margin:10px 0}.rpa-guide h3{margin:28px 0 12px}.rpa-guide h4{font-size:1.06rem;margin:8px 0 12px}.rpa-guide p{max-width:95ch;line-height:1.65}.rpa-guide-intro{max-width:1000px}.rpa-guide .rpa-support{padding:18px 22px;border:1px solid #4c6860;border-left:4px solid var(--mint);background:#101c19;border-radius:8px}.rpa-support p:last-child{margin-bottom:0}.rpa-walkthrough{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.rpa-walkthrough article,.rpa-reading,.rpa-alternative{padding:20px;background:var(--bg);border:1px solid var(--line);border-radius:8px;min-width:0}.rpa-guide .rpa-walkthrough p{font-size:.9rem}.rpa-guide button{min-height:44px;white-space:normal;text-align:left}.rpa-source-example{display:block;font-size:1.25rem;margin:18px 0}.rpa-reading dl{display:grid;grid-template-columns:minmax(160px,.7fr) minmax(0,1.5fr);gap:14px 24px}.rpa-reading dt{font-weight:650}.rpa-reading dd{margin:0;line-height:1.6}.rpa-guide details:not(.rpa-inspector details){margin-top:18px}.rpa-guide summary{min-height:44px;padding:10px 0;cursor:pointer}.rpa-concepts dd{margin:6px 0 16px}.rpa-concepts dt{font-weight:650}.rpa-guide .syntax-cyan{color:#22d3ee}.rpa-guide .syntax-emerald{color:#34d399}.rpa-guide .syntax-amber{color:#f59e0b}.rpa-guide .syntax-pink{color:#f472b6}#rpa-load-status{padding:12px 0;color:var(--mint)}.rpa-native-guide{border:1px solid var(--line);border-radius:8px;padding:6px 18px}@media(max-width:900px){.rpa-walkthrough{grid-template-columns:1fr}.rpa-reading dl{grid-template-columns:1fr;gap:6px}.rpa-reading dd{margin-bottom:16px}}@media(max-width:480px){.rpa-guide{padding:14px}.rpa-walkthrough article,.rpa-reading,.rpa-alternative{padding:14px}}

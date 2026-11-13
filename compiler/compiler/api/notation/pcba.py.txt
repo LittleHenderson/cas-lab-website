@@ -1,0 +1,261 @@
+"""Offline terminal artifact adapter for the supported structural CCDL dialect.
+
+The reader and checker own language semantics. This adapter projects their real
+tokens, document, diagnostics and netlist into the terminal's existing contract.
+It emits no bytecode. Simulation is an explicit, separate scalar-runtime request;
+ordinary compilation performs structural checks only. Neither measures cognition.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+from .pcba_reader import (
+    CCDL_GRAMMAR,
+    MAX_SOURCE_BYTES,
+    PcbaParseError,
+    lex_pcba_document,
+    parse_pcba_document,
+)
+from .pcba_check import check_pcba_document
+
+
+def _empty_diagram() -> dict[str, Any]:
+    return {"kind": "cas_diagram", "schema_version": "1.0", "layouts": ["semantic"],
+            "nodes": [], "edges": [], "containers": []}
+
+
+def _netlist_diagram(result: dict[str, Any]) -> dict[str, Any]:
+    """Display declared, resolved connections; add no inferred net equivalence."""
+    diagram = _empty_diagram()
+    diagram["scope"] = (
+        "Declared PCBA schematic; structural validation only, no simulation. "
+        "Arrows show checker netlist edges. Neutral component/probe attachments "
+        "are recorded separately because the preserved renderer draws only directed edges.")
+    if result.get("simulation") is not None:
+        diagram["scope"] = (
+            "Declared PCBA schematic; a static view of checked connections. "
+            "Computed scalar execution is recorded separately in the simulation trace. "
+            "Arrows show checker netlist edges; neutral terminal/probe attachments "
+            "are metadata because the preserved renderer draws only directed edges.")
+    netlist = result.get("netlist") or {}
+    document = result.get("document") or {}
+    statement_locations: dict[tuple[int, int], dict[str, Any]] = {}
+    pending_statements = list(document.get("statements") or [])
+    while pending_statements:
+        statement = pending_statements.pop()
+        location = statement.get("location") or {}
+        if "line" in location and "column" in location:
+            statement_locations[(location["line"], location["column"])] = statement
+        pending_statements.extend(statement.get("statements") or [])
+    nodes: dict[str, dict[str, Any]] = {}
+    edges: list[dict[str, Any]] = []
+    attachments: list[dict[str, Any]] = []
+    containers: list[dict[str, Any]] = []
+
+    def net_node(identity: str, reference: str | None = None, **metadata: Any) -> None:
+        if identity not in nodes:
+            nodes[identity] = {"id": identity, "kind": "pcba_net", "label": reference or identity,
+                               "role": "declared_net", **metadata}
+
+    for name, symbol in (netlist.get("symbols") or {}).items():
+        if symbol.get("kind") in {"node", "input", "output"}:
+            net_node("name:" + name, name, symbol_kind=symbol.get("kind"),
+                     domain=symbol.get("domain"), state=symbol.get("state"))
+
+    for name, component in (netlist.get("components") or {}).items():
+        identity = "component:" + name
+        nodes[identity] = {"id": identity, "kind": "pcba_component",
+                           "label": f"{name}: {component.get('type', component.get('kind', 'component'))}",
+                           "role": "declared_component", "parameters": component.get("parameters", {})}
+        for role, terminal in (component.get("resolved_terminals") or {}).items():
+            if not terminal:
+                continue
+            endpoint = terminal["id"]
+            net_node(endpoint, terminal.get("reference"), domain=terminal.get("domain"),
+                     state=terminal.get("state"))
+            attachments.append({"id": f"terminal:{name}:{role}", "net": endpoint,
+                                "component": identity, "terminal": role,
+                                "reference": terminal.get("reference")})
+
+    for probe in netlist.get("probes") or []:
+        target = probe.get("target")
+        if target:
+            net_node(target["id"], target.get("reference"), domain=target.get("domain"),
+                     state=target.get("state"))
+            attachments.append({"id": "probe:" + probe["name"], "net": target["id"],
+                                "probe": probe["name"], "reference": target.get("reference"),
+                                "scope": "Declared test point; no measurement was made."})
+
+    for index, connection in enumerate(netlist.get("edges") or []):
+        source, target = connection["source"], connection["target"]
+        location = connection.get("location") or {}
+        statement = statement_locations.get((location.get("line"), location.get("column")), {})
+        net_node(source, statement.get("source") if source.startswith("inline:") else None)
+        net_node(target, statement.get("target") if target.startswith("inline:") else None)
+        label = connection.get("kind", "connection")
+        if connection.get("gain_literal") is not None:
+            label += " (declared gain " + str(connection["gain_literal"]) + ")"
+        edges.append({"id": "declared:" + str(connection.get("id", index)),
+                      "source": source, "target": target, "kind": "pcba_connection",
+                      "label": label, "directed": True,
+                      "declared_connection": connection})
+
+    diagram["nodes"] = list(nodes.values())
+    diagram["edges"] = edges
+    diagram["terminal_attachments"] = attachments
+    diagram["declared_loops"] = netlist.get("loops") or []
+    pending = list(document.get("statements") or [])
+    while pending:
+        statement = pending.pop(0)
+        if statement.get("kind") == "layer":
+            children = statement.get("statements") or []
+            members = ["name:" + child["name"] for child in children
+                       if child.get("kind") == "node" and "name:" + child["name"] in nodes]
+            containers.append({"id": "layer:" + statement["name"], "kind": "pcba_layer",
+                               "label": "Layer " + statement["domain"], "contains": members,
+                               "domain": statement["domain"], "expanded": True})
+            pending.extend(children)
+    if nodes:
+        containers.insert(0, {"id": "pcba_document", "kind": "pcba_document",
+                              "label": str(document.get("name", "PCBA document")),
+                              "contains": list(nodes), "expanded": True})
+    diagram["containers"] = containers
+    return diagram
+
+
+@dataclass
+class PcbaArtifact:
+    source: str
+    stage: str = "run"
+    tokens: list[dict[str, Any]] = field(default_factory=list)
+    ast: dict[str, Any] | None = None
+    result: dict[str, Any] | None = None
+    warnings: list[str] = field(default_factory=list)
+    diagnostics: list[dict[str, Any]] = field(default_factory=list)
+    valid: bool = False
+    error: str | None = None
+    parse_status: str = "NOT_RUN"
+    structural_status: str = "NOT_RUN"
+    execution_status: str = "NOT_IMPLEMENTED"
+    engine: str = "python-ccdl"
+    bytecode: list[Any] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {"source": self.source, "valid": self.valid, "error": self.error,
+                "engine": self.engine, "language": "ccdl", "stage": self.stage,
+                "warnings": self.warnings, "tokens": self.tokens, "ast": self.ast,
+                "type": {"kind": "pcba_document", "domains": [], "singular": True}
+                        if self.ast is not None else None,
+                "bytecode": self.bytecode, "result": self.result,
+                "parse_status": self.parse_status, "structural_status": self.structural_status,
+                "execution_status": self.execution_status, "diagnostics": self.diagnostics}
+
+    def diagram(self) -> dict[str, Any]:
+        if not self.valid or self.structural_status != "PASS" or self.result is None:
+            return _empty_diagram()
+        return _netlist_diagram(self.result)
+
+
+def compile_ccdl(source: str, *, mode: str = "run") -> PcbaArtifact:
+    """Lex, parse, or structurally check CCDL. ``run`` means the same check."""
+    if mode not in {"lex", "parse", "check", "run"}:
+        raise ValueError(f"unsupported CCDL inspection mode {mode!r}")
+    artifact = PcbaArtifact(source=source, stage=mode)
+    try:
+        artifact.tokens = [token for token in lex_pcba_document(source) if token["kind"] != "EOF"]
+        if mode == "lex":
+            artifact.valid = True
+            return artifact
+        if mode == "parse":
+            artifact.ast = parse_pcba_document(source)
+            artifact.parse_status = "PASS"
+            artifact.valid = True
+            return artifact
+        report = check_pcba_document(source)
+        artifact.result = {**report, "kind": "pcba_document"}
+        artifact.ast = report.get("document")
+        artifact.parse_status = report["parse_status"]
+        artifact.structural_status = report["structural_status"]
+        artifact.diagnostics = list(report.get("diagnostics") or [])
+        artifact.warnings = [str(item["message"]) for item in artifact.diagnostics
+                             if item.get("severity") != "error"]
+        artifact.valid = report.get("valid") is True and artifact.structural_status == "PASS"
+        if not artifact.valid:
+            messages = [f"{item.get('code', 'CCDL')}: {item['message']}"
+                        for item in artifact.diagnostics if item.get("severity") in {"error", "unverified"}]
+            artifact.error = "; ".join(messages) or "CCDL structural validation did not pass"
+        else:
+            graph = artifact.diagram()
+            if graph["terminal_attachments"]:
+                artifact.warnings.append(
+                    "Diagram arrows show checked netlist edges. Neutral terminal/probe attachments "
+                    "are listed in the declared result and diagram metadata; the preserved renderer "
+                    "cannot display undirected attachments.")
+            if len(graph["nodes"]) + len(graph["containers"]) > 72:
+                artifact.warnings.append(
+                    "The preserved SVG renderer displays at most 72 nodes/containers; "
+                    "the JSON netlist and HTML result panel retain the complete declared structure.")
+            if len(graph["edges"]) > 80:
+                artifact.warnings.append(
+                    "The preserved SVG renderer displays at most 80 edges; "
+                    "the JSON netlist and HTML result panel retain all declared connections.")
+        return artifact
+    except PcbaParseError as exc:
+        artifact.parse_status = "NOT_SUPPORTED" if "UNSUPPORTED" in exc.code.upper() else "FAIL"
+        artifact.error = str(exc)
+        artifact.diagnostics = [{"code": exc.code, "severity": "error", "message": exc.message,
+                                 "line": exc.line, "column": exc.column}]
+        return artifact
+
+
+def compile_ccdl_file(path: str | Path, *, mode: str = "run") -> PcbaArtifact:
+    try:
+        with Path(path).open("rb") as handle:
+            raw = handle.read(MAX_SOURCE_BYTES + 1)
+        if len(raw) > MAX_SOURCE_BYTES:
+            return PcbaArtifact(source=str(path), stage=mode, error="E-PCBA-LIMIT: UTF-8 source exceeds 64 KiB",
+                                diagnostics=[{"code": "E-PCBA-LIMIT", "severity": "error",
+                                              "message": "UTF-8 source exceeds 64 KiB", "line": 1, "column": 1}])
+        source = raw.decode("utf-8")
+    except (OSError, UnicodeError) as exc:
+        return PcbaArtifact(source=str(path), stage=mode, error=f"Unable to read CCDL source: {exc}",
+                            diagnostics=[{"code": "CCDL_SOURCE_READ", "severity": "error",
+                                          "message": str(exc), "line": None, "column": None}])
+    return compile_ccdl(source, mode=mode)
+
+
+def _simulate_artifact(artifact: PcbaArtifact, *, inputs: dict[str, Any], steps: int) -> PcbaArtifact:
+    """Retain the static report and attach the independently checked runtime result."""
+    from .pcba_sim import simulate_pcba
+
+    simulation = simulate_pcba(artifact.source, inputs=inputs, steps=steps)
+    artifact.stage = "simulate"
+    artifact.execution_status = simulation["execution_status"]
+    if artifact.result is None:
+        artifact.result = {"kind": "pcba_document", "parse_status": artifact.parse_status,
+                           "structural_status": artifact.structural_status,
+                           "valid": artifact.valid, "diagnostics": list(artifact.diagnostics)}
+    artifact.result["simulation"] = simulation
+    artifact.diagnostics.extend(dict(item) for item in simulation.get("diagnostics", []))
+    artifact.valid = artifact.valid and simulation.get("valid") is True and artifact.execution_status == "EXECUTED"
+    if not artifact.valid:
+        artifact.error = simulation.get("error") or artifact.error or "PCBA simulation was rejected"
+    return artifact
+
+
+def simulate_ccdl(source: str, *, inputs: dict[str, Any], steps: int) -> PcbaArtifact:
+    """Explicitly request bounded scalar execution without changing compile defaults."""
+    return _simulate_artifact(compile_ccdl(source), inputs=inputs, steps=steps)
+
+
+def simulate_ccdl_file(path: str | Path, *, inputs: dict[str, Any], steps: int) -> PcbaArtifact:
+    artifact = compile_ccdl_file(path)
+    if any(item.get("code") in {"CCDL_SOURCE_READ", "E-PCBA-LIMIT"}
+           for item in artifact.diagnostics):
+        artifact.stage = "simulate"
+        artifact.execution_status = "NOT_RUN"
+        return artifact
+    return _simulate_artifact(artifact, inputs=inputs, steps=steps)

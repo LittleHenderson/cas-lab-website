@@ -1,0 +1,58 @@
+.cas-inversion { container-type: inline-size; container-name: cas-preview; color-scheme: dark; color: #d0dcd6; background: #0b0f0e; border: 1px solid #4f615c; border-radius: .65rem; padding: clamp(.8rem, 2vw, 1.4rem); font: 1rem/1.5 system-ui, sans-serif; max-width: 65rem; min-width: 0; }
+.cas-inversion *, .cas-inversion *::before, .cas-inversion *::after { box-sizing: border-box; }
+.cas-inversion [hidden] { display: none !important; }
+.cas-inversion h2 { margin: 0 0 .65rem; font-size: 1.45rem; color: #fff; }
+.cas-inversion p { margin: .65rem 0; }
+.cas-inversion-help, .cas-inversion-provenance { color: #d0dcd6; font-size: .9rem; }
+.cas-inversion-controls { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; margin: 1rem 0; }
+.cas-inversion button, .cas-inversion select { font: inherit; min-height: 44px; max-width: 100%; border: 1px solid #9cb0a6; border-radius: .35rem; padding: .55rem .75rem; background: #0f1a17; color: #fff; }
+.cas-inversion button { cursor: pointer; border-color: #38b2ac; }
+.cas-inversion button:disabled, .cas-inversion select:disabled { opacity: .6; cursor: not-allowed; }
+.cas-inversion :focus-visible { outline: 3px solid #5ce0d6; outline-offset: 3px; }
+.cas-inversion-boundary { border-left: 4px solid #f59e0b; padding: .45rem .7rem; background: #0f1a17; }
+.cas-inversion-scope, .cas-inversion-provenance { overflow-wrap: anywhere; }
+.cas-inversion-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0; }
+.cas-inversion figure { margin: 0; min-width: 0; }
+.cas-inversion figcaption { font-weight: 650; margin-bottom: .35rem; }
+.cas-inversion pre { margin: 0; padding: .8rem; background: #060c0a; border: 1px solid #4f615c; border-radius: .35rem; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 1rem; min-height: 3.5rem; }
+.cas-inversion code { font-family: ui-monospace, Consolas, monospace; }
+.cas-inversion-components { table-layout: fixed; width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: .9rem; }
+.cas-inversion-components caption { text-align: left; font-weight: 650; color: #fff; padding-bottom: .5rem; }
+.cas-inversion-components th, .cas-inversion-components td { border-bottom: 1px solid #4f615c; padding: .6rem .35rem; vertical-align: top; text-align: left; overflow-wrap: anywhere; }
+.cas-inversion-components thead th { color: #fff; }
+.cas-inversion-noetic th, .cas-inversion-noetic td:not(:last-child) { color: #22d3ee; }
+.cas-inversion-domain th, .cas-inversion-domain td:not(:last-child) { color: #34d399; }
+.cas-inversion-drive th, .cas-inversion-drive td:not(:last-child) { color: #f59e0b; }
+.cas-inversion-register th, .cas-inversion-register td:not(:last-child) { color: #f472b6; }
+.cas-inversion-component-status { color: #fff; font-weight: 650; }
+.cas-inversion-status { min-height: 3em; font-weight: 600; }
+.cas-inversion[data-state="stale"] .cas-inversion-comparison { border-left: 4px solid #f59e0b; padding-left: .6rem; }
+@media (max-width: 480px) {
+  .cas-inversion-comparison { grid-template-columns: 1fr; }
+  .cas-inversion-controls { align-items: stretch; }
+  .cas-inversion-controls label { width: 100%; }
+  .cas-inversion-controls select, .cas-inversion-controls button { width: 100%; }
+  .cas-inversion-components, .cas-inversion-components tbody { display: block; }
+  .cas-inversion-components caption { display: block; }
+  .cas-inversion-components thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .cas-inversion-components tbody tr { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); margin-bottom: .8rem; border: 1px solid #4f615c; border-radius: .3rem; }
+  .cas-inversion-components tbody th, .cas-inversion-components td:last-child { grid-column: 1 / -1; }
+  .cas-inversion-components th, .cas-inversion-components td { min-width: 0; padding: .5rem .6rem; }
+  .cas-inversion-components td::before { content: attr(data-label); display: block; color: #d0dcd6; font-size: .8rem; font-weight: 400; }
+  .cas-inversion-components td:last-child { border-bottom: none; }
+}
+@container cas-preview (max-width: 480px) {
+  .cas-inversion-comparison { grid-template-columns: 1fr; }
+  .cas-inversion-controls { align-items: stretch; }
+  .cas-inversion-controls label { width: 100%; }
+  .cas-inversion-controls select, .cas-inversion-controls button { width: 100%; }
+  .cas-inversion-components, .cas-inversion-components tbody { display: block; }
+  .cas-inversion-components caption { display: block; }
+  .cas-inversion-components thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .cas-inversion-components tbody tr { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); margin-bottom: .8rem; border: 1px solid #4f615c; border-radius: .3rem; }
+  .cas-inversion-components tbody th, .cas-inversion-components td:last-child { grid-column: 1 / -1; }
+  .cas-inversion-components th, .cas-inversion-components td { min-width: 0; padding: .5rem .6rem; }
+  .cas-inversion-components td::before { content: attr(data-label); display: block; color: #d0dcd6; font-size: .8rem; font-weight: 400; }
+  .cas-inversion-components td:last-child { border-bottom: none; }
+}
+@media (prefers-reduced-motion: reduce) { .cas-inversion *, .cas-inversion *::before, .cas-inversion *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }

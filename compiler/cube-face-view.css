@@ -1,0 +1,9 @@
+.cas-inspector .cas-purpose-card{min-width:0;border:1px solid #324741;border-radius:7px;padding:12px;background:#0e1915}
+.cas-inspector .cas-purpose-line{margin:8px 0;font:13px/1.55 system-ui;white-space:pre-wrap;overflow-wrap:anywhere}
+.cas-inspector .cas-purpose-title{font-size:14px;color:#5eead4}
+.cas-inspector .cas-purpose-card:focus{outline:2px solid #5eead4;outline-offset:2px}
+.cas-inspector .cas-explore-label{display:block;margin-top:14px;font:13px/1.5 system-ui}
+.cas-inspector .cas-explore-select,.cas-inspector .cas-read-explanation{display:block;box-sizing:border-box;width:100%;min-height:44px;margin-top:8px;padding:9px;color:#e5ede9;background:#192924;border:1px solid #5c746d;border-radius:5px;font:13px/1.5 system-ui;cursor:pointer}
+.cas-inspector .cas-explore-select:focus-visible,.cas-inspector .cas-read-explanation:focus-visible{outline:2px solid #5eead4;outline-offset:3px}
+@media(max-width:550px){.cas-inspector .cas-face-grid{grid-template-columns:1fr}.cas-inspector .cas-purpose-card{padding:12px}}
+@media(prefers-reduced-motion:reduce){.cas-purpose-card{scroll-behavior:auto}}

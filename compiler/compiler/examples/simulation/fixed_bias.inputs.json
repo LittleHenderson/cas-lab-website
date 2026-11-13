@@ -1,0 +1,15 @@
+{
+  "profile": "cas.pcba.scalar-fixed-bias/0.1",
+  "input_bindings": {"drive": "cause"},
+  "output_bindings": {"response": "effect"},
+  "initial_state": {
+    "tick": 0,
+    "nodes": {"cause": "0", "bias": "0.1", "effect": "0.6"}
+  },
+  "schedule": [
+    {"drive": "0.2"},
+    {"drive": "0.425"},
+    {"drive": "0.9"},
+    {"drive": "0"}
+  ]
+}

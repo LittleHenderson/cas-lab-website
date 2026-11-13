@@ -1,0 +1,103 @@
+/* Scoped to .lesson-teaching. Canonical syntax colors are unchanged. */
+.lesson-teaching .lesson-panel { margin: 18px 0; padding: 18px; border: 1px solid var(--line, #31453f); border-radius: 8px; min-width: 0; }
+.lesson-teaching .lesson-panel h2 { font-size: 22px; line-height: 1.4; }
+.lesson-teaching .lesson-panel h3 { font-size: 19px; line-height: 1.4; }
+.lesson-teaching .lesson-panel p { font-size: 16px; line-height: 1.7; }
+.lesson-teaching .lesson-panel .guide-table-wrap { overflow-x: auto; }
+.lesson-teaching .lesson-panel table { width: 100%; border-collapse: collapse; }
+.lesson-teaching .lesson-panel th, .lesson-teaching .lesson-panel td { text-align: left; vertical-align: top; padding: 12px; border-bottom: 1px solid var(--line, #31453f); overflow-wrap: anywhere; }
+.lesson-teaching .lesson-panel details { border: 1px solid var(--line, #31453f); border-radius: 8px; padding: 16px; margin: 18px 0; }
+.lesson-teaching .lesson-panel summary { cursor: pointer; font-weight: 650; overflow-wrap: anywhere; }
+.lesson-teaching .lesson-panel .story-steps { padding-left: 22px; }
+.lesson-teaching .lesson-panel .story-steps li { margin: 16px 0; }
+.lesson-teaching .lesson-panel .guide-expression { font-family: ui-monospace, Consolas, monospace; font-size: 24px; white-space: pre-wrap; background: #09100e; border-radius: 8px; padding: 12px; }
+.lesson-teaching .lesson-panel .story-mapping { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.lesson-teaching .lesson-panel .story-map-card { min-width: 0; background: #0c1512; border: 1px solid var(--line, #31453f); border-radius: 8px; padding: 16px; }
+.lesson-teaching .lesson-panel .story-tag { font-family: ui-monospace, Consolas, monospace; font-size: .88em; white-space: nowrap; }
+.lesson-teaching .lesson-load-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.lesson-teaching .lesson-load-actions button { min-height: 44px; }
+.lesson-teaching .teaching-control {
+  appearance: none;
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  background: transparent;
+  border: 0;
+  border-radius: 3px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-transform: none;
+  box-shadow: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  touch-action: manipulation;
+}
+.lesson-teaching .story-phrase.teaching-control {
+  display: inline;
+  border-bottom: 1px solid currentColor;
+}
+.lesson-teaching .guide-expression .teaching-control { min-height: 44px; white-space: nowrap; }
+.lesson-teaching .teaching-control.syntax-cyan { color: #22d3ee; }
+.lesson-teaching .teaching-control.syntax-emerald { color: #34d399; }
+.lesson-teaching .teaching-control.syntax-amber { color: #f59e0b; }
+.lesson-teaching .teaching-control.syntax-pink { color: #f472b6; }
+.lesson-teaching [data-teach-target]:focus-visible {
+  outline: 3px solid var(--text, #e9f2ee);
+  outline-offset: 4px;
+}
+.lesson-teaching .teaching-match {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+  background: #16221f;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: .2em;
+}
+.lesson-teaching .teaching-help { font-size: 15px; }
+.lesson-teaching .teaching-status {
+  min-height: 3.4em;
+  padding: 12px 14px;
+  border-left: 3px solid var(--muted, #adbfb6);
+  background: #101b17;
+  overflow-wrap: anywhere;
+}
+.lesson-teaching .teaching-comparison { padding: 16px 0; border: 0; }
+.lesson-teaching .teaching-comparison table { table-layout: fixed; }
+.lesson-teaching .teaching-comparison caption { text-align: left; padding: 0 0 12px; line-height: 1.6; }
+.lesson-teaching .teaching-comparison th:first-child { width: 22%; }
+.lesson-teaching .teaching-comparison th[scope="row"] { color: var(--text, #e9f2ee); }
+.lesson-teaching .teaching-change { display: block; font-size: 13px; font-weight: 600; margin-top: 6px; }
+.lesson-teaching .teaching-side { display: none; }
+.lesson-teaching .teaching-comparison .teaching-control { display: block; width: 100%; min-height: 44px; }
+.lesson-teaching .teaching-comparison code { display: block; font-size: 21px; margin-bottom: 6px; }
+.lesson-teaching .teaching-part-name { display: block; font-weight: 650; margin-bottom: 6px; }
+.lesson-teaching .teaching-comparison q { display: block; font-size: 15px; line-height: 1.6; }
+@media (max-width: 650px) {
+  .lesson-teaching .lesson-panel { padding: 12px; }
+  .lesson-teaching .lesson-panel .story-mapping { grid-template-columns: 1fr; }
+  .lesson-teaching .lesson-panel details { padding: 10px; }
+  .lesson-teaching .lesson-panel .guide-expression { font-size: 20px; }
+  .lesson-teaching .teaching-comparison table,
+  .lesson-teaching .teaching-comparison caption,
+  .lesson-teaching .teaching-comparison tbody { display: block; width: 100%; }
+  .lesson-teaching .teaching-comparison thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .lesson-teaching .teaching-comparison tbody tr { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: 1px solid var(--line, #31453f); }
+  .lesson-teaching .teaching-comparison th:first-child { width: auto; }
+  .lesson-teaching .teaching-comparison th[scope="row"] { display: block; grid-column: 1 / -1; padding: 14px 6px 4px; border: 0; font-size: 15px; }
+  .lesson-teaching .teaching-comparison td { display: block; min-width: 0; padding: 10px 6px 18px; border: 0; }
+  .lesson-teaching .teaching-comparison .teaching-change { display: inline; margin-left: 12px; }
+  .lesson-teaching .teaching-side { display: block; margin-bottom: 10px; font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--muted, #b0c2b9); }
+  .lesson-teaching .teaching-comparison q { font-size: 14px; }
+  .lesson-teaching .teaching-comparison code { font-size: 18px; }
+  .lesson-teaching .teaching-part-name, .lesson-teaching .teaching-change { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lesson-teaching, .lesson-teaching * { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+@media (forced-colors: active) {
+  .lesson-teaching .teaching-match { outline-color: Highlight; }
+  .lesson-teaching [data-teach-target]:focus-visible { outline-color: CanvasText; }
+}

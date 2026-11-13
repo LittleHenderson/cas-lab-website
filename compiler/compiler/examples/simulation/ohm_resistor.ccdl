@@ -1,0 +1,9 @@
+// Runtime routing is explicit in ohm_resistor.inputs.json.
+// Drive and attention have distinct declared quantity kinds on this net.
+circuit ohm_resistor {
+    input: supply;
+    output: flow;
+    node rail: ^8^C_{F5}|A;
+    resistor r1: Resistor< rail, R=30 >;
+    probe tp_flow: rail;
+}

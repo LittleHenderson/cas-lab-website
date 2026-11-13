@@ -1,0 +1,101 @@
+// Presentation adapter only. No compiler evaluation, input edits, network or storage.
+const NS='http://www.w3.org/2000/svg';
+const SIDES=['front','right','left','back','top','bottom'];
+const TITLES=['Meaning','Symbol','Connections','Origin','Explanation','Exploration'];
+const validFaces=faces=>Array.isArray(faces)&&faces.length===6&&SIDES.every((side,index)=>{
+  const face=faces.find(f=>f.face===side);
+  return face?.title===TITLES[index]&&Array.isArray(face.lines)&&face.lines.every(line=>typeof line==='string');
+});
+function boundedFaces(faces){
+  if(!validFaces(faces))throw Error('Six distinct face records are required.');
+  return SIDES.map(side=>{
+    const original=faces.find(face=>face.face===side);
+    const lines=original.lines.slice(0,32).map(line=>line.length>2048?line.slice(0,2045)+'...':line);
+    if(original.lines.length>32||original.lines.some(line=>line.length>2048))lines.push('Some detail was shortened for this view. Inspect the complete result in Full JSON.');
+    return {face:side,title:original.title,lines};
+  });
+}
+export function replaceCubeFaceText(svgSource, records){
+  const parsed=new DOMParser().parseFromString(svgSource,'image/svg+xml');
+  if(parsed.documentElement.localName!=='svg'||parsed.querySelector('parsererror'))throw Error('Invalid compiler SVG.');
+  const byId=new Map(records.map(record=>[record.nodeId,record]));
+  for(const cube of parsed.querySelectorAll('.cas-cube')){
+    const record=byId.get(cube.dataset.nodeId);
+    if(!record)throw Error('Missing face records for a displayed cube.');
+    const faces=boundedFaces(record.faces);
+    for(const tooltip of [...cube.children].filter(child=>child.localName==='title'))
+      tooltip.textContent=faces.map(face=>face.title+': '+face.lines.join('; ')).join('\n');
+    for(const face of faces){
+      const panel=[...cube.querySelectorAll('[data-face]')].find(element=>element.dataset.face===face.face);
+      if(!panel)throw Error('A cube side is missing.');
+      panel.dataset.title=face.title;panel.dataset.lines=JSON.stringify(face.lines);
+      const texts=[...panel.children].filter(child=>child.localName==='text');
+      if(!texts.length)throw Error('A cube side has no title.');
+      const title=texts[0];title.textContent=face.title.toUpperCase();
+      texts.slice(1).forEach(text=>text.remove());
+      [...panel.children].filter(child=>child.localName==='title').forEach(child=>child.remove());
+      const detail=parsed.createElementNS(NS,'title');detail.textContent=face.title+'\n'+face.lines.join('\n');panel.append(detail);
+      const preview=[];
+      for(const line of face.lines){
+        const words=line.trim().split(/\s+/);let part='';
+        for(const word of words){if((part+' '+word).trim().length>27&&part){preview.push(part);part=word;}else part=(part+' '+word).trim();}
+        if(part)preview.push(part);
+        if(preview.length>=3)break;
+      }
+      preview.slice(0,3).forEach((line,index)=>{
+        const text=parsed.createElementNS(NS,'text');
+        for(const [name,value] of Object.entries({x:50,y:40+index*11,'text-anchor':'middle',fill:'#f1f5f9','font-family':'sans-serif','font-size':6.1,'font-weight':700}))text.setAttribute(name,String(value));
+        text.textContent=line.length>30?line.slice(0,27)+'...':line;
+        panel.append(text);
+      });
+    }
+  }
+  const serialized=new XMLSerializer().serializeToString(parsed.documentElement);
+  if(serialized.length>2097152)throw Error('The detailed diagram exceeds the 2 MiB browser view limit.');
+  return serialized;
+}
+function append(parent,tag,className,text){const node=parent.ownerDocument.createElement(tag);node.className=className;if(text!==undefined)node.textContent=text;parent.append(node);return node;}
+
+/** Mount after existing cube controls. Selecting items only calls their inspector. */
+export function mountCubeFaceInspector({canvas,records=[]}={}){
+  const svg=canvas?.querySelector('svg[data-cas-cubes]'),inspector=svg?.nextElementSibling;
+  if(!svg||!inspector?.classList.contains('cas-inspector'))return()=>{};
+  const byId=new Map(records.filter(record=>validFaces(record.faces)).map(record=>[record.nodeId,record]));
+  const cubes=[...svg.querySelectorAll('.cas-cube')];
+  const selectCube=id=>{
+    const target=cubes.find(cube=>cube.dataset.nodeId===id);
+    if(target){target.dispatchEvent(new MouseEvent('click',{bubbles:true}));queueMicrotask(()=>inspector.querySelector('.cas-explore-select')?.focus({preventScroll:true}));}
+  };
+  const refresh=()=>{
+    const selected=svg.querySelector('.cas-cube[aria-pressed="true"]');
+    const record=byId.get(selected?.dataset.nodeId),grid=inspector.querySelector('.cas-face-grid');
+    if(!record||!grid)return;
+    const sourcePanels=[...selected.querySelectorAll('[data-face]')];
+    const cards=[...grid.children];
+    cards.forEach((card,index)=>{if(!card.dataset.face)card.dataset.face=sourcePanels[index]?.dataset.face;});
+    for(const face of boundedFaces(record.faces)){
+      const card=cards.find(card=>card.dataset.face===face.face);if(!card)continue;
+      card.replaceChildren();card.classList.add('cas-purpose-card');grid.append(card);
+      append(card,'h4','cas-purpose-title',face.title);
+      for(const line of face.lines){
+        if(line.startsWith('Authored scenario annotation: ')){
+          const box=append(card,'div','cas-authored-annotation');box.dataset.annotationNodeId=record.nodeId;
+          append(box,'h5','cas-annotation-heading','Authored scenario annotation');
+          append(box,'p','cas-annotation-phrase',line.slice('Authored scenario annotation: '.length));
+        }else append(card,'p','cas-purpose-line',line);
+      }
+      if(face.face==='bottom'){
+        const label=append(card,'label','cas-explore-label','Inspect a displayed item');
+        const choose=append(label,'select','cas-explore-select');choose.setAttribute('aria-label','Inspect a displayed graph item');
+        cubes.forEach(cube=>{const option=append(choose,'option','',cube.dataset.label+' ['+cube.dataset.nodeId+']');option.value=cube.dataset.nodeId;});
+        choose.value=record.nodeId;choose.addEventListener('change',()=>selectCube(choose.value));
+        const read=append(card,'button','cas-read-explanation','Read this item’s explanation');read.type='button';
+        read.addEventListener('click',()=>{const target=grid.querySelector('[data-face="top"]');target.tabIndex=-1;target.focus({preventScroll:true});target.scrollIntoView({block:'nearest',behavior:'instant'});});
+      }
+    }
+  };
+  const observer=new MutationObserver(refresh);observer.observe(inspector,{childList:true});
+  let disposed=false;
+  const cleanup=()=>{if(disposed)return;disposed=true;observer.disconnect();svg.removeEventListener('cas-dispose',cleanup);};
+  svg.addEventListener('cas-dispose',cleanup,{once:true});refresh();return cleanup;
+}

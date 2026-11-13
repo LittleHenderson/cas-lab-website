@@ -1,0 +1,92 @@
+[
+  {
+    "id": "relationships",
+    "name": "Relationships — guided example",
+    "category": "Beginner guide",
+    "source": "^3^E_{F4}|f",
+    "description": "Maya has spent her Sunday making a poster for a neighborhood fundraiser. She sends it to Jon, a close friend who volunteered to help. He replies, “The headline is hard to read.” This is an invented teaching scene; Maya’s interpretation is stated explicitly so you can examine it. Read the complete expression as Maya’s aversion to the criticism, within her appraisal of it, with connection to Jon at stake and hurt in the foreground. It joins four descriptions of this selected moment. Jon’s words, Maya’s interpretation and her later silence remain distinct parts of the written account.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "relationships-variation",
+    "name": "Relationships — explore another possibility",
+    "category": "Beginner guide",
+    "source": "^6^C_{F4}|A",
+    "description": "In an alternative continuation, Maya pauses before closing the chat. She keeps the friendship important and examines what “hard to read” could mean. She then asks Jon which part of the headline is difficult to read. The operator changes from aversion (^3) to unpacking (^6); the domain changes from evaluation (^E) to thought (^C); the register changes from feeling-toned (|f) to analytical (|A). Connection (F4) stays. The variation represents her examination of the comment; the compiler does not generate her question or Jon’s reply.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "learning",
+    "name": "Learning — guided example",
+    "category": "Beginner guide",
+    "source": "^2^C_{F2}|A",
+    "description": "Samira is taking an evening numeracy class. Her tutor Kai draws one pizza cut into halves and another cut into quarters. Samira has memorized that 1/2 equals 2/4, but wants the equality to make sense. The expression describes attraction toward a fraction idea in thought, motivated by understanding and expressed through analytical comparison. The operator tells you her relation to the idea; it is the story phrase about equal areas that supplies the particular idea being considered.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "learning-variation",
+    "name": "Learning — explore another possibility",
+    "category": "Beginner guide",
+    "source": "^7^O_{F2}|E",
+    "description": "Samira chooses a different learning activity for the following week. Each evening she uses paper circles to rehearse the same relationship between halves and quarters. ^2^C becomes ^7^O: interest in a mental idea becomes a repeated action pattern. |A becomes |E: explaining the comparison becomes manipulating the pieces. Wisdom remains F2. Running either expression produces a description of the selected state; learning gains would need to be observed separately.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "work",
+    "name": "Work — guided example",
+    "category": "Beginner guide",
+    "source": "^6^C_{F6}|A",
+    "description": "Alex coordinates a Saturday repair cafe at the library. Volunteers will help neighbors mend small household items. The team has said the event must be \"ready to open,\" but nobody has agreed what ready includes. This expression describes Alex unpacking the idea of readiness in thought, motivated by a dependable structure and using ordered reasoning. The room, tools and people come from the story; the expression identifies the kind of activity, domain, motive and manner.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "work-variation",
+    "name": "Work — explore another possibility",
+    "category": "Beginner guide",
+    "source": "^7^O_{F5}|E",
+    "description": "On later Saturdays, Alex uses an established opening routine. He now focuses on getting the chosen activity underway rather than designing its organization. ^6^C becomes ^7^O as unpacking a plan becomes a recurring action. F6 changes to F5 because the story now emphasizes acting on the plan. |A becomes |E as reasoning about dependencies becomes hands-on setup. Neither expression schedules the volunteers or checks whether a tool is safe.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "social-pressure",
+    "name": "Social pressure — guided example",
+    "category": "Beginner guide",
+    "source": "^5^P_{F4}|f",
+    "description": "Nia's friends suggest a weekend meal that costs $90. She has set aside $40 for the outing. Over years of family gatherings and friendships, she has absorbed the idea that being a good friend means accepting invitations. The expression describes a belief that has become part of Nia's outlook, operating as a guiding rule, motivated by connection and experienced through guilt and anxiety. The compiler identifies this supplied structure; the story explains which belief and which friends are involved.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "social-pressure-variation",
+    "name": "Social pressure — explore another possibility",
+    "category": "Beginner guide",
+    "source": "^6^C_{F5}|A",
+    "description": "Nia pauses and separates the invitation into practical choices. She can care about the friendship while deciding how to use the money and time available to her. ^5^P becomes ^6^C: an established guiding belief gives way to examining the parts of the choice. F4 becomes F5 as the immediate focus shifts from belonging to self-directed action. |f becomes |A as the selected state shifts from feeling to explicit comparison. This change does not predict her friends' response.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "reflection",
+    "name": "Spiritual reflection — guided example",
+    "category": "Beginner guide",
+    "source": "^1^P_{F7}|T",
+    "description": "After speaking impatiently to her father, Ruth sits quietly in the evening. In her spiritual reflection, she considers the value of caring for another person with patience. The scene uses Ruth's own stated meaning without assigning her a particular religious tradition. Read this as Ruth holding a guiding intention in awareness, motivated by purpose and considering it in a wider view of her life. The expression organizes her account of meaning; the words of the account make the particular intention and relationship clear.",
+    "language": "cas",
+    "mode": "run"
+  },
+  {
+    "id": "reflection-variation",
+    "name": "Spiritual reflection — explore another possibility",
+    "category": "Beginner guide",
+    "source": "^7^O_{F7}|E",
+    "description": "Ruth chooses a simple practice: after dinner each evening, she puts her phone aside, makes tea and spends ten minutes listening to her father. ^1^P becomes ^7^O as awareness of a principle becomes a recurring action. Purpose stays F7. |T becomes |E as broad reflection becomes direct physical participation. Whether this helps Ruth listen more patiently is a question for observing and reflecting on the practice.",
+    "language": "cas",
+    "mode": "run"
+  }
+]

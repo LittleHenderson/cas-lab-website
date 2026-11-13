@@ -1,0 +1,72 @@
+/* CAS Lab site theme for the bundled compiler. Loaded last on every page. */
+:root{--bg:#050b0a;--panel:#0c1513;--raised:#13201c;--line:#20302b;--text:#eaf3ee;--muted:#b3c2ba;--mint:#37f5a0;--radius:2px;font-family:'Geist',ui-sans-serif,system-ui,sans-serif}
+h1,h2,h3,.brand,summary{font-family:'Space Grotesk','Geist',system-ui,sans-serif}
+h1{font-weight:600;letter-spacing:-.04em}h2,h3{font-weight:600}
+.eyebrow,.card-number,.start-number,.edition,#runtime,#shortcut{font-family:'Geist Mono',ui-monospace,monospace}
+.eyebrow{letter-spacing:.08em;font-weight:500}
+button,select,input,textarea,.workbench,.cards article,.use-cases article,.people-grid article,.reference-panel,.mark{border-radius:2px}
+.cards article{background:var(--panel)}
+.primary{color:#050b0a}.primary:hover:not(:disabled){background:#eaf3ee;color:#050b0a}
+.skip{color:#050b0a}
+.caslab-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 40px;border-bottom:1px solid var(--line);background:#000;font:500 12px/1.4 'Geist Mono',ui-monospace,monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.caslab-bar a{display:inline-flex;align-items:center;min-height:44px;color:var(--text);text-decoration:none}
+.caslab-bar a:hover{color:var(--mint)}
+@media(max-width:760px){.caslab-bar{padding:6px 16px}.caslab-bar span{display:none}}
+
+/* Header: black bar, 10-dot logo with wordmark, one row of links, one button. */
+header{background:#000;border-bottom:1px solid #eaf3ee;max-width:none;padding:14px clamp(16px,3vw,40px);flex-wrap:wrap;gap:16px}
+.brand{gap:14px}
+.dot-logo{width:77px;height:124px}
+.brand-text{display:flex;flex-direction:column;gap:10px}
+.brand-name{font:700 20px/1 'Space Grotesk','Geist',sans-serif;letter-spacing:-.02em;color:var(--text)}
+.brand .brand-name strong{background:#8b9096;color:#050b0a;padding:.16em .34em .14em;margin-left:.06em;border-radius:2px;font-weight:600}
+.brand-sub{font:500 10px 'Geist Mono',ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:#86958d}
+header nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:6px 22px;max-width:none}
+header nav a{color:var(--text);font:400 15px 'Geist',sans-serif;white-space:nowrap;padding:6px 0}
+header nav a:hover{color:var(--mint)}
+header nav .nav-compiler{color:var(--mint);font-weight:500;background:none;padding-left:0}
+.nav-more{position:relative}
+.nav-more summary{list-style:none;cursor:pointer;color:#86958d;font:400 15px 'Geist',sans-serif;padding:6px 0}
+.nav-more summary::-webkit-details-marker{display:none}
+.nav-more summary::after{content:" ▾";font-size:11px}
+.nav-more[open] summary,.nav-more summary:hover{color:var(--text)}
+.nav-more div{position:absolute;right:0;top:calc(100% + 8px);z-index:20;display:flex;flex-direction:column;min-width:170px;padding:6px 0;background:#000;border:1px solid var(--line)}
+.nav-more div a{padding:10px 16px}
+header .free-access{flex-direction:row;align-items:center}
+header .book-download{flex-direction:row;min-height:44px;padding:0 18px;border:0;border-radius:2px;background:var(--mint);color:#050b0a}
+header .book-download:hover{background:#eaf3ee}
+.book-download-action{font:500 15px 'Geist',sans-serif}
+.book-download-title{display:none}
+/* Hero: one column over a slowly drifting 10-dot field. */
+.framework-intro{position:relative;display:block;overflow:hidden;padding:clamp(32px,5vw,72px) 0}
+body::before,body::after{content:"";position:fixed;inset:-440px;pointer-events:none;z-index:-1}
+body::before{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22280%22%3E%3Cg%20fill%3D%22%2337f5a0%22%20fill-opacity%3D%220.05%22%3E%3Ccircle%20cx%3D%22143.0%22%20cy%3D%22162.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22121.1%22%20cy%3D%22175.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22164.9%22%20cy%3D%22175.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22143.0%22%20cy%3D%22190.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22121.1%22%20cy%3D%22205.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22164.9%22%20cy%3D%22205.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22143.0%22%20cy%3D%22220.3%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22121.1%22%20cy%3D%22234.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22164.9%22%20cy%3D%22234.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22143.0%22%20cy%3D%22247.3%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2248.0%22%20cy%3D%2222.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2226.1%22%20cy%3D%2235.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2269.9%22%20cy%3D%2235.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2248.0%22%20cy%3D%2250.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2226.1%22%20cy%3D%2265.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2269.9%22%20cy%3D%2265.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2248.0%22%20cy%3D%2280.3%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2226.1%22%20cy%3D%2294.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2269.9%22%20cy%3D%2294.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2248.0%22%20cy%3D%22107.3%22%20r%3D%2210.8%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");background-size:200px 280px;animation:caslab-drift-far 90s linear infinite}
+body::after{background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22440%22%3E%3Cg%20fill%3D%22%2337f5a0%22%20fill-opacity%3D%220.075%22%3E%3Ccircle%20cx%3D%2280.0%22%20cy%3D%2241.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2243.5%22%20cy%3D%2263.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22116.5%22%20cy%3D%2263.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2280.0%22%20cy%3D%2288.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2243.5%22%20cy%3D%22113.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22116.5%22%20cy%3D%22113.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2280.0%22%20cy%3D%22137.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2243.5%22%20cy%3D%22161.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22116.5%22%20cy%3D%22161.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2280.0%22%20cy%3D%22182.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22240.0%22%20cy%3D%22261.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22203.5%22%20cy%3D%22283.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22276.5%22%20cy%3D%22283.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22240.0%22%20cy%3D%22308.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22203.5%22%20cy%3D%22333.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22276.5%22%20cy%3D%22333.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22240.0%22%20cy%3D%22357.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22203.5%22%20cy%3D%22381.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22276.5%22%20cy%3D%22381.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22240.0%22%20cy%3D%22402.0%22%20r%3D%2218%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");background-size:320px 440px;animation:caslab-drift-near 50s ease-in-out infinite alternate}
+@keyframes caslab-drift-far{to{transform:translate(200px,280px)}}
+@keyframes caslab-drift-near{to{transform:translate(-160px,110px)}}
+@media(prefers-reduced-motion:reduce){body::before,body::after{animation:none}}
+.framework-intro>*{position:relative;z-index:1}
+.framework-intro .eyebrow{font:500 12px 'Geist Mono',ui-monospace,monospace;letter-spacing:.14em;margin:0 0 18px}
+.framework-intro h1{font:600 clamp(40px,5.4vw,80px)/.96 'Space Grotesk','Geist',sans-serif;letter-spacing:-.045em;max-width:none}
+.framework-intro .intro-copy p.lead{font-size:18px;line-height:1.55;max-width:560px;margin:22px 0 0}
+.more-about{max-width:640px;margin-top:14px;font-size:15px}
+.more-about summary{color:var(--mint);font-family:'Geist',sans-serif;font-weight:500}
+.framework-intro .start-here{border:0;background:none;padding:0;margin-top:28px}
+.framework-intro .start-heading{display:none}
+.framework-intro .start-cards{display:flex;flex-direction:column;gap:0;margin:0;border-top:1px solid var(--line)}
+.framework-intro .start-cards a{height:auto;align-items:baseline;gap:18px;padding:16px 0;background:none;border:0;border-bottom:1px solid var(--line);border-radius:0}
+.framework-intro .start-cards a:hover{background:none;border-bottom-color:var(--mint)}
+.framework-intro .start-cards strong{font:500 19px/1.25 'Space Grotesk','Geist',sans-serif;color:var(--text);margin-bottom:4px}
+.framework-intro .start-cards a>span:nth-child(2){flex:1}
+.framework-intro .start-cards a>span:nth-child(2)>span{font-size:15px;line-height:1.45}
+.framework-intro .start-number{display:block;font:500 12px 'Geist Mono',ui-monospace,monospace;color:var(--mint)}
+.framework-intro .card-arrow{display:block}
+.tools-overview{border-top:0;margin-top:14px}
+.caslab-credit{color:var(--mint)}
+header nav a[aria-current=page]{box-shadow:0 1px 0 var(--mint)}
+/* Header layout: logo left; menu top right with the download button under it. */
+header{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:24px;row-gap:12px}
+header .brand{grid-column:1;grid-row:1 / span 2}
+header nav{grid-column:2;grid-row:1;align-self:end;justify-content:flex-end}
+header .free-access{grid-column:2;grid-row:2;justify-self:end;align-self:start}
+@media(max-width:760px){header{grid-template-columns:minmax(0,1fr)}header .brand{grid-row:auto}header nav,header .free-access{grid-column:1;grid-row:auto;justify-content:flex-start;justify-self:start;width:auto;order:0}}

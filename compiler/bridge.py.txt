@@ -1,0 +1,141 @@
+"""Browser adapter. CAS and CCDL semantics remain in the unchanged source modules."""
+import builtins
+import io
+import json
+import os
+import re
+import shutil
+import sys
+from pathlib import Path
+
+from api.notation import compiler
+from api.notation.pcba import compile_ccdl, simulate_ccdl, CCDL_GRAMMAR
+from cas_svg import render_svg
+from cas_features import activation_payload, nesting_payload
+import cas_terminal
+
+
+def highlight_browser(source):
+    """Reuse canonical terminal categories, preserving original ASCII arrow width."""
+    if not isinstance(source, str) or len(source.encode('utf-8')) > 16384:
+        return json.dumps({'parts': [], 'limited': True})
+    parts, cursor = [], 0
+    def emit(text, color='slate_300', *, bold=False):
+        nonlocal cursor
+        # The terminal displays -> as one Unicode arrow. An editor must not do so.
+        raw = '->' if text == '\u2192' and source[cursor:cursor+2] == '->' else text
+        parts.append({'text':raw, 'color':cas_terminal.THEME[color], 'category':color, 'bold':bold})
+        cursor += len(raw)
+        return ''
+    cas_terminal._highlight_parts(source, emit)
+    assert ''.join(p['text'] for p in parts) == source
+    return json.dumps({'parts':parts, 'limited':False})
+
+# Resolve the authentic sibling helper before limiting user module reads.
+compiler._load_cas_ohm()
+sys.setrecursionlimit(650)
+_original_open = builtins.open
+_original_io_open = io.open
+
+
+def _check_path(path, mode):
+    if not isinstance(path, (str, bytes, os.PathLike)):
+        raise PermissionError("Only supplied CAS module files can be read.")
+    resolved = os.path.abspath(os.fsdecode(path))
+    # Internal provenance hashing reads immutable, manifest-verified source bytes.
+    # CAS use statements open text mode, so cannot use this exception.
+    if mode == 'rb' and resolved.startswith('/compiler/api/notation/') and re.fullmatch(r'[a-z_]+\.py', os.path.basename(resolved)):
+        return
+    if not resolved.startswith('/workspace/') or not resolved.endswith('.cas') or mode not in ('r', 'rt'):
+        raise PermissionError("Imports can only read supplied .cas files inside this browser workspace.")
+
+
+def _safe_open(path, mode='r', *args, **kwargs):
+    _check_path(path, mode)
+    return _original_open(path, mode, *args, **kwargs)
+
+
+def _safe_io_open(path, mode='r', *args, **kwargs):
+    _check_path(path, mode)
+    return _original_io_open(path, mode, *args, **kwargs)
+
+
+def _pairs(items):
+    result = {}
+    for key, value in items:
+        if key in result:
+            raise ValueError('Duplicate JSON key: ' + key)
+        result[key] = value
+    return result
+
+
+def _reject_number(value):
+    raise ValueError('Use quoted decimal strings for quantities; only integer JSON numbers are supported.')
+
+
+def run_browser(request_json):
+    request = json.loads(request_json)
+    source = request.get('source', '')
+    language = request.get('language', 'cas')
+    mode = request.get('mode', 'run')
+    if language not in ('cas', 'ccdl') or mode not in ('run', 'check', 'lex', 'parse', 'simulate'):
+        raise ValueError('Unknown language or mode.')
+    if not isinstance(source, str) or len(source.encode('utf-8')) > 65536:
+        raise ValueError('Source exceeds the 64 KiB browser limit.')
+    if not source.strip():
+        raise ValueError('Enter a CAS expression or CCDL document.')
+    if language == 'cas' and mode == 'simulate':
+        raise ValueError('Bounded simulation requires CCDL and an explicit input profile.')
+    modules = request.get('modules', {})
+    if not isinstance(modules, dict) or len(modules) > 16:
+        raise ValueError('Supply at most 16 CAS modules.')
+    total = 0
+    for name, content in modules.items():
+        if not re.fullmatch(r'[A-Za-z0-9_-]+(?:/[A-Za-z0-9_-]+)*\.cas', name) or name == 'main.cas':
+            raise ValueError('Module paths must be relative .cas names, without dots or traversal; main.cas is reserved.')
+        if not isinstance(content, str) or len(content.encode('utf-8')) > 65536:
+            raise ValueError('Each module must be UTF-8 text of at most 64 KiB.')
+        total += len(content.encode('utf-8'))
+    if total > 262144:
+        raise ValueError('Combined modules exceed 256 KiB.')
+    # Each run gets a clean, memory-only virtual folder, never a host mount.
+    if os.path.isdir('/workspace'):
+        shutil.rmtree('/workspace')
+    os.makedirs('/workspace')
+    for name, content in {'main.cas': source, **modules}.items():
+        path = Path('/workspace') / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with _original_open(path, 'w', encoding='utf-8') as handle:
+            handle.write(content)
+    builtins.open, io.open = _safe_open, _safe_io_open
+    try:
+        if language == 'cas':
+            artifact = compiler.compile_file('/workspace/main.cas')
+        elif mode == 'simulate':
+            raw = request.get('inputs', '')
+            if not isinstance(raw, str) or len(raw.encode('utf-8')) > 65536:
+                raise ValueError('Simulation inputs exceed 64 KiB.')
+            inputs = json.loads(raw, object_pairs_hook=_pairs, parse_float=_reject_number, parse_constant=_reject_number)
+            if not isinstance(inputs, dict):
+                raise ValueError('Simulation inputs must be a JSON object.')
+            steps = request.get('steps')
+            if type(steps) is not int or not 1 <= steps <= 256:
+                raise ValueError('Simulation steps must be an integer from 1 to 256.')
+            artifact = simulate_ccdl(source, inputs=inputs, steps=steps)
+        else:
+            artifact = compile_ccdl(source, mode=mode)
+        data = artifact.to_dict()
+        data['browser_view'] = mode
+        data['diagram'] = artifact.diagram()
+        if language == 'cas':
+            data['activations'] = activation_payload(artifact)
+            data['nesting'] = nesting_payload(data.get('result'))
+        payload = json.dumps(data, ensure_ascii=False, allow_nan=False)
+        if len(payload.encode('utf-8')) > 4 * 1024 * 1024:
+            raise ValueError('Result exceeds the 4 MiB browser limit. Reduce the source or step count.')
+        svg = render_svg(data['diagram'], result=data.get('result'), title='CAS structure') if artifact.valid else ''
+        if len(svg.encode('utf-8')) > 2 * 1024 * 1024:
+            raise ValueError('Diagram exceeds the 2 MiB browser limit. Reduce the source.')
+        return json.dumps({'artifact': data, 'svg': svg}, ensure_ascii=False, allow_nan=False)
+    finally:
+        builtins.open, io.open = _original_open, _original_io_open

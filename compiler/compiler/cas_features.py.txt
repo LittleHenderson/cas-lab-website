@@ -1,0 +1,261 @@
+"""Source-backed capability and learning additions for the isolated terminal."""
+
+import json
+
+
+CAPABILITIES = """CAS Offline Compiler Terminal - bounded PCBA simulator successor
+
+Default backend: bundled Python (stdlib only; no ambient native extension).
+Source: October 1 reviewed compiler (commit 8a3555b8), pinned in SOURCE_MANIFEST.json.
+The main checkout matched the old package; the newer reviewed worktree did not.
+
+Python supports typed let/fn/export/use, file-relative modules, transitions,
+RPM, fractals, v7.5 registers, v7.6 symbolic recipes/yield queries, v7.7
+register sets and named emergence, and v7.8 finite sets/tuples/meta assertions.
+The newer source adds cas.nesting/0.2 canonical/cancellation readings, unresolved
+cases, cross-domain nesting warnings, set membership and identifier fixes,
+and preserved partial AST diagnostics. Legacy arithmetic fields remain distinct.
+CAS-Ohm: bundled source-bound helper for ohm_scale, ohm_drive, ohm_attention,
+ohm_constraint, ohm_flow (I=V/R), ohm_required_drive (V=I*R), and
+ohm_effective_constraint (R=V/I). Decimal strings preserve exact input values.
+Quantities require declared coherent scales and source references. Mismatched
+scales, negative/nonfinite values and zero denominators are rejected. No automatic
+unit conversion, calibration, measurement, causal identification or control occurs.
+Recipe and yield objects are symbolic: they do not calculate production yield.
+False meta assertions are valid expressions whose result is false.
+Diagrams describe parsed structure; they are not proof of a true assertion.
+
+Added terminal access: --file / :load, --mode, --grammar, --activations,
+warnings, and an optional explicit native casc adapter.
+Python lex/parse/check views follow the upstream CLI: the full compiler runs
+before selecting the requested fields. They are not execution-free stages.
+
+PCBA: select --language ccdl (or :language ccdl in the REPL), then --file / :load
+a CCDL circuit or board. The bounded reader/checker supports a declared subset
+of the book's schematic/layout syntax, component parameters, typed nodes,
+connections, layers and vias. --grammar describes the implemented subset.
+The checked netlist is exported through the existing terminal/SVG/HTML renderers.
+Default valid means the implemented structural checks passed. Unsupported or unverified semantics cannot
+produce a valid artifact. Read diagnostics and validation_limits in --json.
+CCDL is separate from CAS expressions. Default run remains structural checking.
+
+Explicit simulation: --language ccdl --simulate --inputs REQUEST.json --steps N
+with --file BOARD.ccdl. Use --trace TRACE.json for the complete numeric run report.
+Requests must select an implemented versioned profile. Fixed-bias scalar CJTs
+use an idealized zero-origin gain/cutoff/saturation model from the book's tutorial;
+the separate CAS-Ohm resistor profile uses declared coherent scales and I=V/R.
+Inputs, initial state and per-step schedules are explicit. Evaluation is bounded
+and deterministic; cycles, missing bindings and unsupported components fail.
+Profiles declare scheduling, boundaries and state conventions. No general CCDL
+execution model, hidden memory/delay, human cognition or HELM learning is inferred.
+Read SIMULATION.md for exact profiles, numeric domains, examples and limits.
+
+Native: select --backend native --casc-path ABSOLUTE_PATH_TO_CASC.
+Uses the external casc CLI's own lex/parse/check/run and --manifest support.
+Native check and every manifest mode execute the full compiler/runtime.
+Only native expression/file lex and parse stop at the frontend.
+The inspected Rust source adds inferred function types and package entries.
+It is a separate dialect, not a superset of the bundled Python compiler.
+Native output has no diagram: terminal diagrams and SVG/HTML are unavailable.
+No native binary is bundled, selected automatically, built, or downloaded.
+Native binary/source freshness and runtime compatibility remain NOT_RUN.
+Native requests have a 30-second timeout, 2 MiB combined output cap, and
+a 64-level JSON depth limit; errors remain explicit without Python fallback.
+
+Unavailable: arbitrary English compilation, neural-network inference/training, deferred
+inversion axes, the full CCDL roadmap, external governance claims, or numerical recipe
+simulation. Unsupported syntax produces a compiler error; no substitute result.
+"""
+
+
+def install_learning_additions(terminal):
+    """Keep example numbers and visual functions; correct stale drive prose."""
+    replacements = {
+        "Operator Composition (x)": "Positive in the Principled domain under F2 Wisdom integrates with Above/Cause in that domain under F6 Structure.",
+        "Compound state, Transcendent": "Positive in the Cognitive domain, under F2 Wisdom, is expressed through the Transcendent register.",
+        "State variant cluster": "Group an Analytical Negative/Principled/F2 Wisdom state and an Affective Positive/Cognitive state.",
+        "CAS coordinate tuple": "Name the coordinate Positive, Principled domain, F2 Wisdom, Analytical register.",
+        "Drive membership": "F2 Wisdom is one member of the seven CAS drives.",
+        "Theoretical yield query": "Represent a theoretical yield query for focus. The compiler returns an unevaluated symbolic query, not a numerical yield.",
+    }
+    for example in terminal.EXAMPLES:
+        if example["label"] in replacements:
+            example["natural"] = replacements[example["label"]]
+    terminal.EXAMPLES.extend([
+        {"expr": "let start: state[C] = C2; fn step(x: state[C]): state[C] = x * C8; step(start)",
+         "label": "Typed bindings and functions", "category": "Language workflow",
+         "natural": "Bind a Cognitive state and pass it through a function whose input and output must be Cognitive states."},
+        {"expr": "|States| = 40", "label": "Finite assertion result", "category": "Language workflow",
+         "natural": "Check the finite state-set cardinality; inspect the Boolean holds field separately from compiler validity."},
+        {"expr": "^8^C \u2218 ^9^C", "label": "Nesting cancellation readings", "category": "Latest nesting",
+         "natural": "Inspect both canonical readings and the cancellation criterion. The legacy composed operator is a separate projection."},
+        {"expr": "^3^C \u2218 ^2^C", "label": "Unresolved nesting readings", "category": "Latest nesting",
+         "natural": "Inspect differing nesting readings and open questions without forcing an agreed canonical answer."},
+        {"expr": "^8^C \u2218 ^9^E", "label": "Cross-domain nesting warning", "category": "Latest nesting",
+         "natural": "Keep each term's Domain and show the compiler's warning about the Domain of the nested whole."},
+        {"expr": 'let scale = ohm_scale("example-v1", "drive-unit", "attention-unit"); let drive = ohm_drive("12", scale, "design", "example:drive"); let constraint = ohm_constraint("4", scale, "design", "example:constraint"); ohm_flow(drive, constraint)',
+         "label": "CAS-Ohm declared attention flow", "category": "CAS-Ohm arithmetic",
+         "natural": "Calculate 12/4 = 3 attention units on one declared scale. This is a design calculation, not a measurement or validated cognitive outcome."},
+    ])
+    terminal.DICTIONARY.extend([
+        {"term": "Nesting analysis", "category": "Latest nesting", "notation": "f \u2218 g",
+         "definition": "The first written thought is innermost; the last governs. The compiler emits separate canonical readings, a cancellation criterion, orbit class and unresolved questions.",
+         "example": "^8^C \u2218 ^9^C", "learn": "Read cas.nesting/0.2 fields. Do not replace a NOT_DECIDED_BY_THE_BOOK result with a confident class."},
+        {"term": "File module", "category": "Language workflow", "notation": 'use "helpers.cas"',
+         "definition": "Import a local CAS file relative to the file being compiled. Explicit exports limit the imported names.",
+         "example": 'python cas.py --file main.cas', "learn": "Use --file or :load so the compiler knows the source directory. File source is passed unchanged."},
+        {"term": "Compiler backend", "category": "Language workflow", "notation": "--backend python | native",
+         "definition": "Python is the bundled diagram-capable dialect. Native is an explicitly supplied casc executable with its own supported grammar.",
+         "example": "python cas.py --capabilities", "learn": "The two compilers are not interchangeable. Native does not emit diagrams."},
+        {"term": "Symbolic yield", "category": "Language workflow", "notation": "Y_T(Omega_focus)",
+         "definition": "An unevaluated production query represented by the compiler.",
+         "example": "Y_T(Omega_focus)", "learn": "A valid query is not a computed numeric yield."},
+        {"term": "CAS-Ohm", "category": "CAS-Ohm arithmetic", "notation": "ohm_flow(drive, constraint)",
+         "definition": "Exact declared-scale calculations: attention flow = drive/constraint, required drive = attention*constraint, effective constraint = drive/attention.",
+         "example": "python cas.py --file examples/ohm_flow.cas --json",
+         "learn": "Declare units, origin and reference. Zero denominators and mismatched scales are errors. Inverting a ratio is not causal identification or independent validation."},
+        {"term": "PCBA / CCDL", "category": "Cognitive circuit structure", "notation": "--language ccdl",
+         "definition": "A bounded implementation of the book's declarative Cognitive Circuit Description Language. Typed components and nets describe a circuit or multilayer board.",
+         "example": "python cas.py --language ccdl --grammar",
+         "learn": "Compile a supported CCDL file with --file. Inspect diagnostics, checked wiring and validation_limits. Default compilation performs structural checks; numeric execution requires --simulate and an explicit supported profile."},
+        {"term": "PCBA numeric simulation", "category": "Cognitive circuit design", "notation": "--simulate --inputs REQUEST.json --steps N",
+         "definition": "Execute an explicitly selected, bounded numeric design profile against a CCDL board, producing component operations, state snapshots, outputs and probe traces.",
+         "example": "python cas.py --language ccdl --file examples/simulation/cascade.ccdl --simulate --inputs examples/simulation/cascade.inputs.json --steps 4 --trace trace.json",
+         "learn": "Read SIMULATION.md. Fixed-bias scalar CJTs are an idealized tutorial model; CAS-Ohm resistor calculations use declared scales. Neither verifies human cognition. Unsupported dynamics fail clearly."},
+    ])
+
+
+def diagnostic_payload(result):
+    """Retain source-result paths and complete supported result records.
+
+    Ohm input lineage is already inside each quantity record; do not expand it
+    into duplicate standalone panels. Equal values at different program paths
+    remain distinct, including the repeated final_result.
+    """
+    records = []
+    pending = [("$", result)]
+    while pending:
+        path, value = pending.pop()
+        if isinstance(value, dict):
+            if value.get("kind") in {"cas_ohm_scale", "cas_ohm_quantity", "pcba_document"} or value.get("schema") == "cas.pcba.check/0.2":
+                records.append({"path": path, "result": value})
+                continue
+            pending.extend((path + "." + str(key), child)
+                           for key, child in reversed(list(value.items())))
+        elif isinstance(value, (list, tuple)):
+            pending.extend((f"{path}[{index}]", value[index])
+                           for index in range(len(value) - 1, -1, -1))
+    return records
+
+
+def result_detail(result):
+    """Readable calculations and structural status without empirical claims."""
+    lines = []
+    for record in diagnostic_payload(result):
+        item, path = record["result"], record["path"]
+        if item.get("kind") == "cas_ohm_scale":
+            lines.append(f"  CAS-Ohm scale at {path}: {item.get('id')} (user declared; calibration NOT_VERIFIED)")
+        elif item.get("kind") == "cas_ohm_quantity":
+            exact = item.get("exact_value", {})
+            lines.extend([
+                f"  CAS-Ohm at {path}: {item.get('quantity')} = {item.get('value')} {item.get('unit')}",
+                f"  exact ratio: {exact.get('numerator')}/{exact.get('denominator')}; decimal rounded: {item.get('decimal_is_rounded')}",
+                f"  origin: {item.get('origin')}; operation: {item.get('operation') or 'input declaration'}; reference: {item.get('reference')}",
+                "  Declared-scale calculation only: no measurement, calibration, causal identification or control.",
+            ])
+            for note in item.get("notes", []):
+                lines.append(f"  note: {note}")
+        else:
+            netlist = item.get("netlist") or {}
+            simulation = item.get("simulation")
+            lines.extend([
+                f"  PCBA at {path}: parse={item.get('parse_status')}; structural={item.get('structural_status')}",
+                f"  checked netlist: {len(netlist.get('components', []))} components; {len(netlist.get('edges', []))} connections",
+                ("  Structural checker results; numeric execution is reported separately below."
+                 if isinstance(simulation, dict) else "  Structural checks only; no circuit execution was requested."),
+            ])
+            for name, component in (netlist.get("components") or {}).items():
+                terminals = ", ".join(f"{role}={terminal.get('reference')}"
+                                      for role, terminal in (component.get("resolved_terminals") or {}).items()
+                                      if isinstance(terminal, dict))
+                lines.append(f"  component {name} ({component.get('type')}): {terminals or 'no resolved terminals'}")
+            for probe in netlist.get("probes", []):
+                target = probe.get("target") or {}
+                probe_note = ("simulated samples are in the trace; no empirical measurement"
+                              if isinstance(simulation, dict) else "no reading performed")
+                lines.append(f"  probe {probe.get('name')}: declared target={target.get('reference')}; {probe_note}")
+            if netlist.get("components") or netlist.get("probes"):
+                lines.append("  Diagrams show directed netlist edges; terminal attachments and probe targets remain declarations in these details and full JSON.")
+            for diagnostic in item.get("diagnostics", []):
+                lines.append(f"  {diagnostic.get('code')}: {diagnostic.get('message')}")
+            if isinstance(simulation, dict):
+                lines.extend([
+                    f"  simulation profile: {simulation.get('profile')}",
+                    f"  numeric execution: {simulation.get('execution_status')}; steps {simulation.get('steps_completed')}/{simulation.get('steps_requested')}",
+                    "  Numeric design-model results; no measured human cognition, empirical regulation or HELM learning.",
+                ])
+                for name, value in (simulation.get("outputs") or {}).items():
+                    lines.append(f"  output {name}: {json.dumps(value, ensure_ascii=False, sort_keys=True)}")
+                if simulation.get("trace_sha256"):
+                    lines.append(f"  trace SHA256: {simulation['trace_sha256']}")
+                if simulation.get("error"):
+                    lines.append(f"  simulation error: {simulation['error']}")
+    return "\n".join(lines)
+
+
+def nesting_payload(result):
+    """Keep every nesting and its location in the serialized Python result.
+
+    Program final_result intentionally repeats a statement value; retain that
+    path rather than collapsing different statements with equal semantics.
+    """
+    records = []
+    pending = [("$", result)]
+    while pending:
+        path, value = pending.pop()
+        if isinstance(value, dict):
+            nesting = value.get("nesting")
+            if isinstance(nesting, dict) and nesting.get("schema") == "cas.nesting/0.2":
+                records.append({"path": path + ".nesting", "nesting": nesting})
+            pending.extend((path + "." + str(key), child)
+                           for key, child in reversed(list(value.items())) if key != "nesting")
+        elif isinstance(value, list):
+            pending.extend((f"{path}[{index}]", value[index])
+                           for index in range(len(value) - 1, -1, -1))
+    return records
+
+
+def nesting_text(result):
+    return "\n".join(_one_nesting_text(record) for record in nesting_payload(result))
+
+
+def _one_nesting_text(record):
+    nesting = record["nesting"]
+    canonical = nesting.get("canonical_form", {})
+    criterion = nesting.get("dual_cancellation_criterion", {})
+    return "\n".join([
+        f"  nesting at {record['path']}",
+        f"  nesting schema: {nesting.get('schema')}",
+        f"  innermost: {nesting.get('innermost')}; governing: {nesting.get('governing')}",
+        f"  canonical (surfacing first): {canonical.get('surfacing_member_first', {}).get('form')}",
+        f"  canonical (either order): {canonical.get('either_order', {}).get('form')}",
+        f"  canonical agreement: {canonical.get('agreed')}",
+        f"  cancellation criterion met: {criterion.get('met')}; readings agree: {criterion.get('readings_agree')}",
+        f"  orbit: {nesting.get('orbit_class')}",
+        f"  reason: {nesting.get('orbit_class_reason')}",
+        f"  open questions: {', '.join(nesting.get('open_questions', [])) or 'none listed'}",
+        "  Legacy composed_operator is a separate numeric projection. Use --json for all readings.",
+    ])
+
+
+def activation_payload(artifact):
+    """Serialize the existing compiler's AST annotation view, not model data."""
+    return [
+        {
+            "position": item.position,
+            "registers_active": sorted(item.registers_active),
+            "is_register_set": item.is_register_set,
+            "emergent_name": item.emergent_name,
+        }
+        for item in artifact.activations()
+    ]

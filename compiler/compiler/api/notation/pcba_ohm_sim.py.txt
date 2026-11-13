@@ -1,0 +1,260 @@
+"""Bounded stateless CAS-Ohm execution on explicitly bound resistor nets.
+
+Appendix I supplies I=V/R. Named-net identity comes from the preserved CCDL
+checker. The numeric bindings, independent path rule, scheduling and output
+selection are this profile's declared adapter conventions, not full CCDL
+execution semantics. Each named net has one resistor, one external drive and
+one external attention output. No flow is coerced to scalar CJT activation.
+"""
+from __future__ import annotations
+
+from copy import deepcopy
+import hashlib
+import json
+from pathlib import Path
+from typing import Any
+
+from .pcba_check import check_pcba_document
+
+
+PROFILE = "cas.pcba.ohm-resistor/0.1"
+SCHEMA = "cas.pcba.simulation/0.1"
+MAX_STEPS = 256
+MAX_NODES = 128
+MAX_COMPONENTS = 64
+MAX_COMPONENT_EVALUATIONS = 8192
+MAX_TRACE_BYTES = 4 * 1024 * 1024
+HELPER_SHA256 = "20cc15753b43115478c524b00cd015661b225cc57b3f686cdba824e4c2f67afb"
+SOURCES = [
+    {"path": "book/CAS_PCBA_Engineer/Appendix_I_CAS_Ohm_Measurement_and_Calibration.md",
+     "sha256": "5be5667eb9b37460a7b7c2f9c21ca664582445f54136c0cb0a87cec6dd98de60",
+     "lines": [94, 108], "use": "CAS-Ohm equation I=V/R"},
+    {"path": "book/CAS_PCBA_Engineer/Appendix_C_CCDL_Language_Reference.md",
+     "sha256": "452d64308f860b1c0e5b6c3f4d9c8a91760822baa9b9fcd1a6e12a4797983d8f",
+     "lines": [224, 232], "use": "identity of explicitly named nets"},
+    {"path": "book/CAS_PCBA_Engineer/Appendix_C_CCDL_Language_Reference.md",
+     "sha256": "452d64308f860b1c0e5b6c3f4d9c8a91760822baa9b9fcd1a6e12a4797983d8f",
+     "lines": [917, 927], "use": "execution scheduling is an adapter convention"},
+    {"path": "api/notation/cas_ohm.py", "sha256": HELPER_SHA256,
+     "use": "unchanged typed exact arithmetic loaded by compiler._load_cas_ohm"},
+]
+
+
+class OhmSimulationError(ValueError):
+    def __init__(self, code: str, message: str):
+        self.code, self.message = code, message
+        super().__init__(message)
+
+
+def _reject(code: str, message: str) -> None:
+    raise OhmSimulationError(code, message)
+
+
+def _json(value: Any) -> str:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=True, allow_nan=False)
+
+
+def _digest(value: Any) -> str:
+    return hashlib.sha256(_json(value).encode("utf-8")).hexdigest()
+
+
+def _mapping(value: Any, label: str, keys: set[str] | None = None) -> dict:
+    if type(value) is not dict or any(type(key) is not str for key in value):
+        _reject("SIM_REQUEST", f"{label} must be an object with string keys")
+    if keys is not None and set(value) != keys:
+        _reject("SIM_REQUEST", f"{label} requires exactly these keys: {', '.join(sorted(keys))}")
+    return value
+
+
+def _ohm_call(module: Any, operation: Any, *args: Any) -> Any:
+    try:
+        return operation(*args)
+    except module.CasOhmError as error:
+        _reject(error.code, str(error).removeprefix(error.code + ": "))
+
+
+def _prepare(source: Any, inputs: Any, steps: Any) -> dict:
+    if type(steps) is not int or not 1 <= steps <= MAX_STEPS:
+        _reject("SIM_STEP_LIMIT", f"steps must be an integer in [1,{MAX_STEPS}]")
+    request = _mapping(inputs, "simulation request", {
+        "profile", "scale", "input_bindings", "output_bindings", "initial_state", "schedule"})
+    if request["profile"] != PROFILE:
+        _reject("SIM_PROFILE", f"Explicit profile {PROFILE!r} is required")
+    if type(source) is not str:
+        _reject("SIM_SOURCE", "CCDL source must be text")
+    try:
+        checked = check_pcba_document(source)
+    except (OSError, ImportError) as error:
+        _reject("SIM_SOURCE_RECEIPT", f"Preserved CCDL checker dependencies are unavailable: {error}")
+    if checked.get("valid") is not True or checked.get("structural_status") != "PASS":
+        _reject("SIM_STATIC_CHECK", "The preserved CCDL checker did not pass this source")
+    document, netlist = checked["document"], checked["netlist"]
+    allowed = {"input", "output", "node", "component", "probe"}
+    for statement in document["statements"]:
+        if statement["kind"] not in allowed:
+            _reject("SIM_UNSUPPORTED_STATEMENT", f"No Ohm execution rule for {statement['kind']!r}")
+    if netlist["edges"] or netlist["loops"]:
+        _reject("SIM_OHM_CONNECTION", "Ohm profile requires independent resistor paths without CCDL transfer edges or cycles")
+    symbols, components = netlist["symbols"], netlist["components"]
+    nodes = {name for name, symbol in symbols.items() if symbol["kind"] == "node"}
+    declared_inputs = {name for name, symbol in symbols.items() if symbol["kind"] == "input"}
+    declared_outputs = {name for name, symbol in symbols.items() if symbol["kind"] == "output"}
+    if not nodes or len(nodes) > MAX_NODES or not components or len(components) > MAX_COMPONENTS:
+        _reject("SIM_GRAPH_LIMIT", f"Require 1..{MAX_NODES} nodes and 1..{MAX_COMPONENTS} resistors")
+    if not declared_inputs or not declared_outputs:
+        _reject("SIM_IO", "Declare at least one external input and output")
+    if len(components) * steps > MAX_COMPONENT_EVALUATIONS:
+        _reject("SIM_WORK_LIMIT", f"Request exceeds {MAX_COMPONENT_EVALUATIONS} component evaluations")
+    inbound = _mapping(request["input_bindings"], "input_bindings", declared_inputs)
+    outbound = _mapping(request["output_bindings"], "output_bindings", declared_outputs)
+    for label, bindings in (("input_bindings", inbound), ("output_bindings", outbound)):
+        for external, node in bindings.items():
+            if type(node) is not str or node not in nodes:
+                _reject("SIM_BINDING", f"{label}.{external} must reference a declared typed node")
+        if len(set(bindings.values())) != len(bindings):
+            _reject("SIM_MULTIPLE_DRIVERS", f"{label} requires one distinct named net per terminal")
+        if set(bindings.values()) != nodes:
+            _reject("SIM_OHM_UNBOUND_NET", f"{label} must cover every resistor net exactly once")
+    _mapping(request["initial_state"], "initial_state", set())
+    scale_description = _mapping(request["scale"], "scale", {"id", "drive_unit", "attention_unit"})
+    # The loader binds the executed bytes to their digest; importing a sibling
+    # module by ordinary package name would bypass this provenance boundary.
+    from . import compiler
+    try:
+        ohm = compiler._load_cas_ohm()
+    except (OSError, ImportError, compiler.CompilerError) as error:
+        _reject("SIM_OHM_HELPER", f"Bundled Ohm helper could not be loaded: {error}")
+    if getattr(ohm, "__cas_ohm_source_sha256_raw__", None) != HELPER_SHA256:
+        _reject("SIM_OHM_HELPER", "Loaded Ohm helper bytes do not match the pinned arithmetic source")
+    implementation_hashes = dict(checked["sources"]["implementation_sha256_lf"])
+    try:
+        implementation_hashes["pcba_ohm_sim.py"] = hashlib.sha256(
+            Path(__file__).read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+    except OSError as error:
+        _reject("SIM_SOURCE_RECEIPT", f"Ohm runtime source receipt is unavailable: {error}")
+    implementation_hashes["cas_ohm.py"] = ohm.__cas_ohm_source_sha256_lf__
+    scale = _ohm_call(ohm, ohm.make_scale, scale_description["id"],
+                      scale_description["drive_unit"], scale_description["attention_unit"])
+    prepared, net_owners = {}, {}
+    for name, component in components.items():
+        if component["type"] != "Resistor":
+            _reject("SIM_UNSUPPORTED_COMPONENT", f"Ohm profile has no transfer rule for {component['type']!r}")
+        terminal = component["resolved_terminals"].get("state")
+        if (not terminal or terminal["reference"] not in nodes or
+                terminal["id"] != "name:" + terminal["reference"]):
+            _reject("SIM_BINDING", f"Resistor {name} must reference a declared named node")
+        node = terminal["reference"]
+        if node in net_owners:
+            _reject("SIM_OHM_AMBIGUOUS_NET", "Multiple resistors on one net do not establish series or parallel topology")
+        net_owners[node] = name
+        constraint = _ohm_call(ohm, ohm.make_quantity, "constraint",
+                               component["parameter_literals"]["R"], scale, "design",
+                               f"ccdl:{document['source_sha256']}:{name}.R")
+        if constraint.value == 0:
+            _reject("OHM_ZERO_CONSTRAINT", "attention flow is undefined for zero constraint")
+        prepared[name] = {"node": node, "constraint": constraint}
+    if set(net_owners) != nodes:
+        _reject("SIM_OHM_UNBOUND_NET", "Every declared node must have exactly one resistor")
+    probes = {}
+    for probe in netlist["probes"]:
+        terminal = probe["target"]
+        if (not terminal or terminal["reference"] not in nodes or
+                terminal["id"] != "name:" + terminal["reference"]):
+            _reject("SIM_UNBOUND_PROBE", f"Probe {probe['name']} must read a named resistor net")
+        probes[probe["name"]] = terminal["reference"]
+    schedule = request["schedule"]
+    if type(schedule) is not list or len(schedule) != steps:
+        _reject("SIM_SCHEDULE", "schedule must contain exactly steps input frames")
+    normalized = []
+    for tick, frame in enumerate(schedule, 1):
+        frame = _mapping(frame, f"schedule[{tick - 1}]", declared_inputs)
+        values = {}
+        for external, raw in frame.items():
+            declared = _mapping(raw, f"schedule[{tick - 1}].{external}", {
+                "quantity", "value", "origin", "reference"})
+            if declared["quantity"] != "drive":
+                _reject("SIM_OHM_QUANTITY", "An Ohm input must explicitly declare quantity='drive'; attention is not drive")
+            if type(declared["value"]) is not str:
+                _reject("OHM_NUMBER", "Simulation input values require quoted finite nonnegative decimal text")
+            if type(declared["origin"]) is not str or declared["origin"] not in {"design", "supplied_observation"}:
+                _reject("OHM_ORIGIN", "Input origin must be design or supplied_observation; calculated is reserved")
+            values[external] = _ohm_call(ohm, ohm.make_quantity, "drive", declared["value"], scale,
+                                         declared["origin"], declared["reference"])
+        normalized.append(values)
+    return {"source_sha256": document["source_sha256"], "ohm": ohm, "scale": scale,
+            "implementation_sha256_lf": implementation_hashes,
+            "components": prepared, "order": sorted(prepared), "schedule": normalized,
+            "input_bindings": dict(inbound), "output_bindings": dict(outbound), "probes": probes,
+            "bindings_sha256": _digest({"input_bindings": inbound, "output_bindings": outbound,
+                                         "scale": scale_description})}
+
+
+def simulate_ohm_profile(source: str, *, inputs: dict, steps: int) -> dict:
+    """Compute all frames or return an atomic rejection with no partial trace.
+
+Ticks index independent samples. Empty state is mandatory: resistors retain
+no memory and no prior output supplies a later input. Probe values are typed
+attention quantities at the associated resistor net, not normalized activation.
+"""
+    result = {"schema": SCHEMA, "profile": PROFILE, "valid": False,
+              "execution_status": "REJECTED", "error": None, "diagnostics": [],
+              "steps_requested": steps if type(steps) is int and 1 <= steps <= MAX_STEPS else None,
+              "steps_completed": 0, "source_sha256": None, "trace": [],
+              "initial_state": None, "final_state": None, "outputs": None,
+              "update_order": [], "sources": deepcopy(SOURCES),
+              "arithmetic": "EXACT_NONNEGATIVE_RATIONAL",
+              "scope": "Computed CAS-Ohm resistor-path design model; no measured cognition or activation conversion",
+              "limits": {"steps": MAX_STEPS, "nodes": MAX_NODES, "components": MAX_COMPONENTS,
+                         "component_evaluations": MAX_COMPONENT_EVALUATIONS,
+                         "number_characters": 512, "value_bits": 4096, "trace_bytes": MAX_TRACE_BYTES},
+              "conventions": {"transfer": "attention=drive/constraint",
+                              "constraint": "CCDL R literal interpreted on the explicitly declared coherent scale",
+                              "connections": "input_bindings and output_bindings attach declared I/O to independent named resistor nets",
+                              "probe": "reads calculated attention at its named resistor net",
+                              "state": "empty; each sample is independent", "time": "sample index only; no duration or delay",
+                              "scheduling": "read complete frame, evaluate components in lexical name order, read outputs and probes",
+                              "conversion": "none; attention cannot drive the scalar CJT profile"}}
+    try:
+        plan = _prepare(source, inputs, steps)
+        ohm, trace, trace_bytes = plan["ohm"], [], 0
+        input_for_net = {node: external for external, node in plan["input_bindings"].items()}
+        output_for_net = {node: external for external, node in plan["output_bindings"].items()}
+        outputs = None
+        for tick, frame in enumerate(plan["schedule"], 1):
+            readings, operations, connections = {}, [], []
+            for name in plan["order"]:
+                component = plan["components"][name]
+                node, constraint = component["node"], component["constraint"]
+                external = input_for_net[node]
+                drive = frame[external]
+                flow = _ohm_call(ohm, ohm.attention_flow, drive, constraint)
+                readings[node] = flow.to_dict()
+                operations.append({"component": name, "type": "Resistor", "net": node,
+                                   "operation": "attention_flow", "equation": "I=V/R",
+                                   "drive": drive.to_dict(), "constraint": constraint.to_dict(),
+                                   "output": readings[node]})
+                connections.append({"input": external, "net": node, "component": name,
+                                    "output": output_for_net[node], "quantity_in": "drive",
+                                    "quantity_out": "attention", "origin": "explicit_adapter_bindings"})
+            outputs = {external: readings[node] for external, node in sorted(plan["output_bindings"].items())}
+            trace_row = {"tick": tick, "inputs": {name: value.to_dict() for name, value in sorted(frame.items())},
+                         "before_state": {}, "components": operations, "connections": connections,
+                         "after_state": {}, "nodes": readings, "outputs": outputs,
+                         "probes": {name: readings[node] for name, node in sorted(plan["probes"].items())}}
+            trace_bytes += len(_json(trace_row).encode("utf-8")) + 1
+            if trace_bytes > MAX_TRACE_BYTES:
+                _reject("SIM_TRACE_LIMIT", f"Simulation trace exceeds {MAX_TRACE_BYTES} bytes")
+            trace.append(trace_row)
+        result.update({"valid": True, "execution_status": "EXECUTED", "steps_completed": steps,
+                       "source_sha256": plan["source_sha256"], "bindings_sha256": plan["bindings_sha256"],
+                       "initial_state": {}, "final_state": {}, "trace": trace, "outputs": outputs,
+                       "update_order": plan["order"], "trace_sha256": _digest(trace),
+                       "component_evaluations": steps * len(plan["order"]), "scale": plan["scale"].to_dict(),
+                       "helper_source_sha256": ohm.__cas_ohm_source_sha256_raw__,
+                       "implementation_sha256_lf": plan["implementation_sha256_lf"],
+                       "implementation_receipt_scope": "Files on disk except helper hash, which binds bytes executed by the pinned loader"})
+    except OhmSimulationError as error:
+        result["error"] = f"{error.code}: {error.message}"
+        result["diagnostics"] = [{"code": error.code, "severity": "error", "message": error.message}]
+    return result

@@ -1,0 +1,85 @@
+{
+  "edition": "Actual bundled Python compiler with browser adapter",
+  "files": [
+    {
+      "path": "api/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "api/notation/__init__.py",
+      "sha256": "97813899f9f2c679d013fdfc28ce563b93cb198a91e49ed94d61006f12d1dae2",
+      "bytes": 142
+    },
+    {
+      "path": "api/notation/cas_ohm.py",
+      "sha256": "20cc15753b43115478c524b00cd015661b225cc57b3f686cdba824e4c2f67afb",
+      "bytes": 14027
+    },
+    {
+      "path": "api/notation/compiler.py",
+      "sha256": "464fd4adfae90a35ba54aa794829da1fe713b9b9cccd68b630ecccfdfbca2f56",
+      "bytes": 286318
+    },
+    {
+      "path": "api/notation/pcba.py",
+      "sha256": "5c2590e8b905eb2320bac95bcb1de21289fb21c3447ba085dd3e6b628c96eb9f",
+      "bytes": 13767
+    },
+    {
+      "path": "api/notation/pcba_check.py",
+      "sha256": "f3bb8becfaef8f3cbafe88da8c137cd9aee93b87fc89ade00c2bbdb362575f5c",
+      "bytes": 23914
+    },
+    {
+      "path": "api/notation/pcba_components.py",
+      "sha256": "cf2a4a44307c1986e311389d5a6eb40a15498d0146f566b183c9899901e17c03",
+      "bytes": 7804
+    },
+    {
+      "path": "api/notation/pcba_ohm_sim.py",
+      "sha256": "f47b95f2df6a5d14a5bb308d3d325dea779177c16ba5a221e9ea4fd3e22e43d8",
+      "bytes": 16070
+    },
+    {
+      "path": "api/notation/pcba_reader.py",
+      "sha256": "d9e647cd1a75b7bf2bc0bb44328371f9fec5ebf7f47cef9099402ef0f348a1a5",
+      "bytes": 21644
+    },
+    {
+      "path": "api/notation/pcba_sim.py",
+      "sha256": "c518ca10c5e7601d40897fd6bab3f42e5b421d8e7a4839e4622efcf37c9363a9",
+      "bytes": 20244
+    },
+    {
+      "path": "cas.py",
+      "sha256": "06f2d6d601b2307e28186eb12593ce79a4a2808a6733616b0e9cfd613cc23414",
+      "bytes": 45606
+    },
+    {
+      "path": "cas_cubes.py",
+      "sha256": "e568fb414a0ae393c798d62cddea305a10d3137963e405618437f8342f36a3e8",
+      "bytes": 30745
+    },
+    {
+      "path": "cas_features.py",
+      "sha256": "767b0a088e0d54beb59303dba81deba1959269cd1ff2f151ea295568f3906173",
+      "bytes": 18174
+    },
+    {
+      "path": "cas_native.py",
+      "sha256": "26fae6e395516c6e9f3a486e3785b120cf3095e530b35708fad9a80c5f663378",
+      "bytes": 20782
+    },
+    {
+      "path": "cas_svg.py",
+      "sha256": "c0987be12f0489d9e9d18ae1719e1116a278fd59a1716aa919252bac07e63158",
+      "bytes": 20987
+    },
+    {
+      "path": "cas_terminal.py",
+      "sha256": "a2a9250e83fc7ddef9c2415064c80ee7ced72b5365fa59b9bed6182dde7ee093",
+      "bytes": 78160
+    }
+  ]
+}

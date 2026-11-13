@@ -1,0 +1,7 @@
+// A declared layout and one downward via, not an executed circuit.
+// Inline via endpoints retain their own identities; no named-node join is inferred.
+board downward_layout {
+    layer P: [ charter: ^5^P_{F7}|T ];
+    layer C: [ understand: ^1^C_{F2}|A ];
+    via intake: ^5^P -> ^1^C;
+}

@@ -1,0 +1,21 @@
+CAS LAB WEBSITE: READY-TO-UPLOAD FOLDER
+
+Upload everything in this folder to your web host, keeping the folder structure.
+index.html is the home page. The compiler lives in the compiler/ folder.
+
+Requirements
+- Any static web host (Netlify, Cloudflare Pages, GitHub Pages, Vercel, or ordinary web hosting).
+- The site must be served over https. The compiler will not start from a file opened by double-click.
+- No server code, database or build step is needed.
+
+Quickest route (Netlify Drop)
+1. Unzip this folder.
+2. Go to app.netlify.com/drop and sign in.
+3. Drag the whole folder onto the page. The site is live at a temporary address in about a minute.
+4. In the site's Domain settings, add your own domain name.
+
+After it is live, check
+- Home page loads and every menu link works.
+- Research > The HELM Cube shows the 3D cube and the light-mode buttons work.
+- Research > CAS Compiler opens the compiler, and "Check" runs a program.
+- Shop shows all pictures.

@@ -1,0 +1,4 @@
+let scale: ohm_scale = ohm_scale("example-v1", "declared-drive", "declared-attention")
+let potential: ohm_drive = ohm_drive("12", scale, "design", "example:potential")
+let supplied_flow: ohm_attention = ohm_attention("3", scale, "supplied_observation", "example:caller-supplied-reading")
+ohm_effective_constraint(potential, supplied_flow)
