@@ -1,6 +1,8 @@
-// GENERATED from dc-runtime/src/*.ts — do not edit. Rebuild with `cd dc-runtime && bun run build`.
+// Production-only fork of dc-runtime from CAS Lab snapshot 492361f. See SECURITY-REVIEW.md.
 "use strict";
 (() => {
+  const productionComponentFactory = window.CASLabProductionComponent;
+  delete window.CASLabProductionComponent;
   var __defProp = Object.defineProperty;
   var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
   var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
@@ -30,7 +32,7 @@
     );
     return {
       template: dc.innerHTML,
-      js: scriptEl ? scriptEl.textContent || "" : "",
+      hasLogic: Boolean(scriptEl),
       props,
       preview
     };
@@ -48,7 +50,7 @@
     );
     return {
       template,
-      js: scriptEl ? scriptEl.textContent || "" : "",
+      hasLogic: Boolean(scriptEl),
       props,
       preview
     };
@@ -155,7 +157,7 @@
     runtime.markFetched(rootName);
     runtime.setRootName(rootName);
     runtime.adoptParsed(rootName, parsed);
-    if (!window.__resources) {
+    {
       fetch(location.href).then((res) => res.ok ? res.text() : "").then((t) => {
         const raw = t ? parseDcText(t) : null;
         if (raw?.template) runtime.updateHtml(rootName, raw.template);
@@ -554,9 +556,8 @@
     const tag = el.tagName.toLowerCase();
     if (tag === "sc-for") return walkFor(el, host);
     if (tag === "sc-if") return walkIf(el, host);
-    if (tag === "x-import") return walkXImport(el, host);
+    if (tag === "x-import" || tag === "dc-import") throw new Error("Component imports are disabled in the public site.");
     if (tag === "sc-helmet") return host.helmet(el);
-    if (tag === "dc-import") return walkComponent(el, host);
     return walkElement(el, host);
   }
   var warnedHoles = /* @__PURE__ */ new Set();
@@ -658,116 +659,6 @@
       ) : null;
     };
   }
-  function walkComponent(el, host) {
-    const name = el.getAttribute("name") || el.getAttribute("component") || "";
-    el.removeAttribute("name");
-    el.removeAttribute("component");
-    const tplId = el.getAttribute("data-dc-tpl");
-    const styleRaw = el.getAttribute("style");
-    el.removeAttribute("style");
-    const styleGet = styleRaw != null ? compileAttr(styleRaw) : null;
-    const { propGetters, hintSize } = collectProps(el, "dc-import", host);
-    const kids = walkChildren(el, host);
-    return (vals, ctx, key) => {
-      const props = {
-        key,
-        __hintSize: hintSize,
-        __tplId: tplId,
-        __hostStyle: styleGet ? hostPositionStyle(styleGet(vals)) : void 0
-      };
-      for (const [k, g] of propGetters) {
-        const v = g(vals);
-        if (k === "dcProps") {
-          if (v && typeof v === "object") Object.assign(props, v);
-          continue;
-        }
-        props[k] = v;
-      }
-      if (kids.length) props.children = kids.map((b, j) => b(vals, ctx, j));
-      return h(host.component(name), props);
-    };
-  }
-  function walkXImport(el, host) {
-    const globalNameGet = compileAttr(
-      el.getAttribute("component-from-global-scope") || ""
-    );
-    const exportNameGet = compileAttr(
-      el.getAttribute("component") || el.getAttribute("name") || ""
-    );
-    const fromRaw = el.getAttribute("from") || (el.getAttribute("component-from-global-scope") ? "" : el.getAttribute("src") || el.getAttribute("import") || "");
-    const urls = fromRaw.trim() ? fromRaw.trim().split(/\s+/) : [];
-    const url = urls.length ? urls[urls.length - 1] : "";
-    const kindOf = (u) => /\.(jsx|tsx)(\?|#|$)/i.test(u) ? "jsx" : "js";
-    const tplId = el.getAttribute("data-dc-tpl");
-    const styleRaw = el.getAttribute("style");
-    el.removeAttribute("style");
-    const styleGet = styleRaw != null ? compileAttr(styleRaw) : null;
-    const wrap = tplId != null || styleGet != null;
-    const { propGetters, hintSize } = collectProps(el, "x-import", host);
-    const hasContent = el.children.length > 0 || !!(el.textContent || "").trim();
-    const deckKeyed = hasContent && isDeckMountTag(el) ? walkDeckChildren(el, host) : null;
-    const kids = deckKeyed ? deckKeyed.kids : hasContent ? walkChildren(el, host) : [];
-    const kidKeys = deckKeyed?.keys ?? null;
-    const urlBindable = fromRaw.includes("{{");
-    if (urls.length && !urlBindable) {
-      let prev;
-      for (const u of urls) prev = host.loadExternal(kindOf(u), u, prev);
-    }
-    const evalName = (g, vals) => {
-      const v = g(vals);
-      const s = v == null ? "" : String(v);
-      return s.includes("{{") ? "" : s;
-    };
-    return (vals, ctx, key) => {
-      const globalName = evalName(globalNameGet, vals);
-      const name = globalName || evalName(exportNameGet, vals);
-      const C = !name || urlBindable ? null : globalName ? host.resolveExternalGlobal(url, globalName) : host.resolveExternal(url, name);
-      const hostStyle = styleGet ? hostPositionStyle(styleGet(vals)) : void 0;
-      const wrapper = wrap ? {
-        key,
-        className: "sc-host-x",
-        "data-dc-tpl": tplId,
-        style: hostStyle || { display: "contents" }
-      } : null;
-      if (!C) {
-        const error = urlBindable ? "x-import `from` cannot contain {{ \u2026 }} \u2014 module URLs are resolved at parse time; use a literal URL" : host.resolveExternalError(url, name);
-        const ph = host.placeholder({
-          key: wrapper ? void 0 : key,
-          name,
-          hintSize,
-          error
-        });
-        return wrapper ? h("div", wrapper, ph) : ph;
-      }
-      const props = wrapper ? {} : { key };
-      let unresolvedHole = false;
-      for (const [k, g] of propGetters) {
-        if (k === "component" || k === "componentFromGlobalScope" || k === "from") {
-          continue;
-        }
-        const v = g(vals);
-        if (v === void 0) unresolvedHole = true;
-        if (k === "dcProps") {
-          if (v && typeof v === "object") Object.assign(props, v);
-          continue;
-        }
-        props[k] = v;
-      }
-      if (unresolvedHole && ctx?.__htmlStreamingNow) {
-        const ph = host.placeholder({
-          key: wrapper ? void 0 : key,
-          name,
-          hintSize,
-          error: null
-        });
-        return wrapper ? h("div", wrapper, ph) : ph;
-      }
-      if (kids.length) {
-        props.children = renderDeckKids(kids, kidKeys, vals, ctx);
-      }
-      return wrapper ? h("div", wrapper, h(C, props)) : h(C, props);
-    };
-  }
   function contentKey(el) {
     const clone = el.cloneNode(true);
     for (const d of clone.querySelectorAll("*")) {
@@ -839,15 +730,9 @@
       return {};
     }
   };
-  function evalDcLogic(src) {
-    //! nosemgrep: eval-and-function-constructor
-    const fn = new Function(
-      "DCLogic",
-      "StreamableLogic",
-      "React",
-      src + '\n;return (typeof Component!=="undefined"&&Component)||undefined;'
-    );
-    return fn(StreamableLogic, StreamableLogic, getReact());
+  function createProductionLogic() {
+    if (typeof productionComponentFactory !== 'function') throw new Error('The fixed production component did not load.');
+    return productionComponentFactory(StreamableLogic, getReact());
   }
 
   // src/component.ts
@@ -909,7 +794,7 @@
         __publicField(this, "__failedVer", -1);
         /** Per-instance constructor error — kept here (not on the registry entry)
          *  so one instance's successful construct can't hide a sibling's failure,
-         *  and a construct can never wipe an eval error `updateJs` recorded on
+         *  and a construct can never wipe a component activation error recorded on
          *  `r.logicError`. */
         __publicField(this, "__ctorError", null);
         __publicField(this, "logic");
@@ -1144,213 +1029,8 @@
   var REACT_SRI = "sha384-DGyLxAyjq0f9SPpVevD6IgztCFlnMF6oW/XQGmfe+IsZ8TqEiDrcHkMLKI6fiB/Z";
   var REACT_DOM_URL = "https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js";
   var REACT_DOM_SRI = "sha384-gTGxhz21lVGYNMcdJOyq01Edg0jhn/c22nsx0kyqP0TxaV5WVdsSH1fSDUf5YJj1";
-  var BABEL_URL = "https://unpkg.com/@babel/standalone@7.29.0/babel.min.js";
-  var BABEL_SRI = "sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y";
   function cdnScriptFor(url, sri) {
-    const res = window.__resources;
-    const v = res ? res[url] : void 0;
-    return typeof v === "string" && v ? { src: v } : { src: url, integrity: sri };
-  }
-
-  // src/external.ts
-  var isCustomElementName = (n) => !n.includes(".") && n.includes("-");
-  function isRenderableType(g) {
-    if (typeof g === "function") return !isElementClass(g);
-    return typeof g === "object" && g !== null && typeof g.$$typeof === "symbol";
-  }
-  function resolveDottedPath(root, name) {
-    let cur = root;
-    for (const seg of name.split(".")) {
-      if (cur == null) return void 0;
-      cur = cur[seg];
-    }
-    return cur;
-  }
-  var GLOBAL_POLL_INTERVAL_MS = 50;
-  var GLOBAL_POLL_TIMEOUT_MS = 3e4;
-  function createExternalModules(onResolved) {
-    const cache = /* @__PURE__ */ new Map();
-    let babelLoading = null;
-    const reportedMissing = /* @__PURE__ */ new Map();
-    const polling = /* @__PURE__ */ new Set();
-    function ensureBabel() {
-      if (window.Babel) return Promise.resolve();
-      if (babelLoading) return babelLoading;
-      const babel = cdnScriptFor(BABEL_URL, BABEL_SRI);
-      babelLoading = new Promise((res, rej) => {
-        const s = document.createElement("script");
-        s.src = babel.src;
-        if (babel.integrity) {
-          s.integrity = babel.integrity;
-          s.crossOrigin = "anonymous";
-        }
-        s.onload = () => res();
-        s.onerror = rej;
-        document.head.appendChild(s);
-      });
-      return babelLoading;
-    }
-    const pending = /* @__PURE__ */ new Map();
-    function load(kind, url, after) {
-      const existing = pending.get(url);
-      if (existing) return existing;
-      cache.set(url, null);
-      console.info("[dc-runtime] x-import: loading", url, "(" + kind + ")");
-      const ready = Promise.all([
-        kind === "jsx" ? ensureBabel() : Promise.resolve(),
-        after ?? Promise.resolve()
-      ]);
-      const p = ready.then(() => {
-        const pre = bundledBlob(url);
-        if (pre) return pre.text();
-        return fetch(url).then((r) => {
-          if (!r.ok) throw new Error("HTTP " + r.status);
-          return r.text();
-        });
-      }).then((src) => {
-        const code = kind === "jsx" ? window.Babel.transform(src, {
-          filename: url,
-          presets: ["react", "typescript"]
-        }).code : src;
-        const module = { exports: {} };
-        const before = new Set(Object.keys(window));
-        //! nosemgrep: eval-and-function-constructor
-        new Function("React", "module", "exports", "require", code)(
-          getReact(),
-          module,
-          module.exports,
-          () => ({})
-        );
-        const globals = {};
-        for (const k of Object.keys(window)) {
-          if (!before.has(k) && typeof window[k] === "function") {
-            globals[k] = window[k];
-          }
-        }
-        cache.set(url, { mod: module.exports, globals });
-        console.info(
-          "[dc-runtime] x-import: loaded",
-          url,
-          "\u2014 exports:",
-          Object.keys(module.exports),
-          "window globals:",
-          Object.keys(globals)
-        );
-        onResolved();
-      }).catch((e) => {
-        cache.set(url, {
-          mod: {},
-          globals: {},
-          error: "failed to load: " + (e instanceof Error && e.message ? e.message : String(e))
-        });
-        console.error(
-          "[dc-runtime] x-import: FAILED to load",
-          url,
-          "(" + kind + ")",
-          e
-        );
-        onResolved();
-      });
-      pending.set(url, p);
-      return p;
-    }
-    function resolve2(url, name) {
-      const entry = cache.get(url);
-      if (!entry) return null;
-      const { mod, globals } = entry;
-      const C = mod && mod[name] || globals && globals[name] || typeof window !== "undefined" && window[name] || mod && mod.default;
-      if (typeof C === "function") return C;
-      const key = url + "\0" + name;
-      if (!reportedMissing.has(key)) {
-        reportedMissing.set(
-          key,
-          entry.error || 'no export named "' + name + '" (has: ' + Object.keys(mod).join(", ") + ")"
-        );
-        console.error(
-          "[dc-runtime] x-import: module",
-          url,
-          "loaded but has no component named",
-          JSON.stringify(name),
-          "\u2014 available exports:",
-          Object.keys(mod),
-          "window globals:",
-          Object.keys(globals),
-          ". The module must `module.exports = {" + name + "}` or set `window." + name + "`."
-        );
-      }
-      return null;
-    }
-    function waitForGlobal(name) {
-      if (polling.has(name)) return;
-      polling.add(name);
-      const started = Date.now();
-      const isCE = isCustomElementName(name);
-      const tick = () => {
-        const found = isCE ? customElements.get(name) : isRenderableType(resolveDottedPath(window, name));
-        if (found) {
-          polling.delete(name);
-          onResolved();
-          return;
-        }
-        if (Date.now() - started >= GLOBAL_POLL_TIMEOUT_MS) {
-          console.warn(
-            "[dc-runtime] x-import: global",
-            JSON.stringify(name),
-            "never appeared on window after " + GLOBAL_POLL_TIMEOUT_MS + "ms"
-          );
-          return;
-        }
-        setTimeout(tick, GLOBAL_POLL_INTERVAL_MS);
-      };
-      setTimeout(tick, GLOBAL_POLL_INTERVAL_MS);
-    }
-    function resolveGlobal(url, name) {
-      const isCE = isCustomElementName(name);
-      if (!url) {
-        if (isCE) {
-          if (customElements.get(name)) return name;
-          waitForGlobal(name);
-          return null;
-        }
-        const g2 = resolveDottedPath(window, name);
-        if (isRenderableType(g2)) return g2;
-        waitForGlobal(name);
-        return null;
-      }
-      const entry = cache.get(url);
-      if (!entry) return null;
-      if (isCE && customElements.get(name)) return name;
-      const g = entry.globals[name] ?? resolveDottedPath(window, name);
-      if (isRenderableType(g)) return g;
-      if (name.includes(".")) return null;
-      const key = url + "\0global\0" + name;
-      if (!reportedMissing.has(key)) {
-        reportedMissing.set(key, null);
-        if (isCE && !customElements.get(name)) {
-          console.warn(
-            "[dc-runtime] x-import:",
-            url,
-            "loaded but no custom element",
-            JSON.stringify(name),
-            "is registered and window." + name + " is not a function \u2014 rendering <" + name + "> as an unknown element."
-          );
-        }
-      }
-      return name;
-    }
-    function getError(url, name) {
-      const entry = cache.get(url);
-      if (entry?.error) return entry.error;
-      return reportedMissing.get(url + "\0" + name) || null;
-    }
-    return { load, resolve: resolve2, resolveGlobal, getError };
-  }
-  function isElementClass(g) {
-    try {
-      return typeof g === "function" && typeof HTMLElement !== "undefined" && g.prototype instanceof HTMLElement;
-    } catch {
-      return false;
-    }
+    return { src: url, integrity: sri };
   }
 
   // src/atomics.ts
@@ -1384,7 +1064,7 @@
     function postDesignMode(mode) {
       if (window.parent === window) return;
       try {
-        window.parent.postMessage({ type: "__dc_design_mode", mode }, "*");
+        window.parent.postMessage({ type: "__dc_design_mode", mode }, window.location.origin);
       } catch {
       }
     }
@@ -1405,6 +1085,8 @@
       }
     }
     window.addEventListener("message", (e) => {
+      if (window.parent === window || e.source !== window.parent ||
+          e.origin !== window.location.origin || !e.data || typeof e.data !== "object") return;
       const type = e.data && e.data.type;
       if (type === "__dc_theme") {
         const t = e.data.theme;
@@ -1436,7 +1118,11 @@
           const mayBePartial = streaming && !helmetClosed && i === raw.length - 1;
           if (tag === "SCRIPT") {
             if (mayBePartial) continue;
-            const key = "SCRIPT|" + (child.getAttribute("src") || child.textContent || "");
+            // Only the shipped image custom element is needed by this fixed template.
+            const scriptSrc = child.getAttribute("src");
+            if (scriptSrc !== "./image-slot.js" || (child.textContent || "").trim())
+              throw new Error("Unexpected script in the production template.");
+            const key = "SCRIPT|" + scriptSrc;
             if (mounted.has(key)) continue;
             mounted.add(key);
             const el = doc.createElement("script");
@@ -1619,7 +1305,7 @@
   }
 
   // src/runtime.ts
-  var COMPONENT_DIR = ".";
+
   function createRuntime(doc = document) {
     const registry = createRegistry();
     const pseudoClass = createPseudoSheet(doc);
@@ -1627,61 +1313,14 @@
       doc,
       (name) => registry.get(name).htmlStreaming
     );
-    const external = createExternalModules(() => registry.bumpAll());
     const factory = createComponentFactory(registry, ensureFetched);
     const host = {
-      component: (name) => factory.getDC(name),
       placeholder: (props) => h(Placeholder, props),
       helmet: (node) => helmet.compile(node),
-      loadExternal: (kind, url, after) => external.load(kind, url, after),
-      resolveExternal: (url, name) => external.resolve(url, name),
-      resolveExternalGlobal: (url, name) => external.resolveGlobal(url, name),
-      resolveExternalError: (url, name) => external.getError(url, name),
       pseudoClass
     };
     function ensureFetched(name) {
-      const r = registry.get(name);
-      if (r.fetched) return;
-      r.fetched = true;
-      const url = COMPONENT_DIR + "/" + encodeURIComponent(name) + ".dc.html";
-      const res = window.__resources;
-      const pre = res ? res[url] : void 0;
-      const target = typeof pre === "string" && pre ? pre : url;
-      const blob = bundledBlob(target);
-      (blob ? blob.text() : fetch(target).then((res2) => {
-        if (!res2.ok) {
-          console.error(
-            '[dc-runtime] sibling fetch for "' + name + '" failed:',
-            url,
-            "returned",
-            res2.status,
-            "\u2014 the reference renders as an empty placeholder."
-          );
-          return "";
-        }
-        return res2.text();
-      })).then((t) => {
-        if (!t) return;
-        const parsed = parseDcText(t);
-        if (!parsed) {
-          console.error(
-            '[dc-runtime] sibling fetch for "' + name + '":',
-            url,
-            "has no <x-dc> block \u2014 not a Design Component."
-          );
-          return;
-        }
-        if (parsed.props) r.propsMeta = parsed.props;
-        if (parsed.preview) r.preview = parsed.preview;
-        if (parsed.template && !r.html) updateHtml(name, parsed.template);
-        if (parsed.js && !r.Logic) updateJs(name, parsed.js);
-      }).catch(
-        (e) => console.error(
-          '[dc-runtime] sibling fetch for "' + name + '" threw:',
-          url,
-          e
-        )
-      );
+      if (!registry.get(name).fetched) throw new Error('Only the fixed production root is available.');
     }
     let rootName = null;
     function updateHtml(name, html) {
@@ -1698,11 +1337,11 @@
       }
       registry.bump(name);
     }
-    function updateJs(name, src) {
+    function activateProductionLogic(name) {
       const r = registry.get(name);
       const seq = r.jsSeq = (r.jsSeq || 0) + 1;
       try {
-        const Cls = evalDcLogic(src);
+        const Cls = createProductionLogic();
         if (r.jsSeq !== seq) return;
         if (typeof Cls !== "function") {
           r.logicError = name + ".dc.html: <script data-dc-script> must define `class Component extends DCLogic`";
@@ -1722,56 +1361,18 @@
       }
       registry.bump(name);
     }
-    function setStreaming(name, kind, on) {
-      const r = registry.get(name);
-      if (kind === "html") r.htmlStreaming = !!on;
-      else r.jsStreaming = !!on;
-      let any = false;
-      for (const n in registry.entries) {
-        const e = registry.entries[n];
-        if (e && (e.htmlStreaming || e.jsStreaming)) {
-          any = true;
-          break;
-        }
-      }
-      doc.documentElement.classList.toggle("sc-dc-streaming", any);
-      registry.bump(name);
-    }
-    function dcUpdate(name, kind, content, streaming) {
-      if (streaming) registry.get(name).fetched = true;
-      if (kind === "html") {
-        setStreaming(name, "html", !!streaming);
-        updateHtml(name, content);
-      } else if (kind === "js") {
-        setStreaming(name, "js", !!streaming);
-        if (!streaming) updateJs(name, content);
-      } else if (kind === "props") {
-        const { props, preview } = parseDataProps(content);
-        const r = registry.get(name);
-        r.propsMeta = props ?? void 0;
-        r.preview = preview;
-        registry.bump(name);
-      }
-    }
-    function setProps(name, overrides) {
-      registry.get(name).propOverrides = overrides && typeof overrides === "object" ? { ...overrides } : null;
-      registry.bump(name);
-    }
     function adoptParsed(name, parsed) {
       if (!parsed) return;
       const r = registry.get(name);
       if (parsed.props) r.propsMeta = parsed.props;
       if (parsed.preview) r.preview = parsed.preview;
       if (parsed.template) updateHtml(name, parsed.template);
-      if (parsed.js) updateJs(name, parsed.js);
+      if (parsed.hasLogic) activateProductionLogic(name);
     }
     return {
       registry,
       getDC: factory.getDC,
       updateHtml,
-      updateJs,
-      dcUpdate,
-      setProps,
       adoptParsed,
       setRootName: (name) => {
         rootName = name;
@@ -1788,33 +1389,6 @@
     };
   }
 
-  // src/stream-state.ts
-  function createStreamTracker(staleMs = 6e4, now = Date.now) {
-    const since = /* @__PURE__ */ new Map();
-    const liveOne = (n) => {
-      const t = since.get(n);
-      if (t === void 0) return false;
-      if (now() - t > staleMs) {
-        since.delete(n);
-        return false;
-      }
-      return true;
-    };
-    return {
-      push(name, streaming, viewportKey) {
-        if (viewportKey === "dc-model") return;
-        if (streaming) since.set(name, now());
-        else since.delete(name);
-      },
-      live(name) {
-        if (name !== void 0) return liveOne(name);
-        for (const n of [...since.keys()]) if (liveOne(n)) return true;
-        return false;
-      }
-    };
-  }
-
-  // src/index.ts
   function hideRawTemplate() {
     const s = document.createElement("style");
     s.textContent = "x-dc{display:none!important}";
@@ -1847,61 +1421,12 @@
   }
   function init() {
     const runtime = createRuntime(document);
-    let rootName = "Root";
-    const baseCss = document.createElement("style");
+    const baseCss = document.createElement('style');
     baseCss.textContent = BASE_CSS;
     document.head.prepend(baseCss);
-    const notifyHost = () => {
-      if (window.parent === window) return;
-      const r = runtime.registry.entries[rootName];
-      try {
-        window.parent.postMessage(
-          {
-            type: "__dc_booted",
-            rootName,
-            propsMeta: r && r.propsMeta || null,
-            preview: r && r.preview || null
-          },
-          "*"
-        );
-      } catch {
-      }
-    };
-    const streams = createStreamTracker();
-    const api = {
-      __dcUpdate: (name, kind, content, streaming, viewportKey) => {
-        streams.push(name, streaming, viewportKey);
-        runtime.dcUpdate(name, kind, content, streaming);
-        if (name === rootName && !streaming && kind === "props") notifyHost();
-      },
-      __dcStreaming: (name) => streams.live(name),
-      __dcSetProps: (name, overrides) => runtime.setProps(name, overrides),
-      /** Name of the component currently mounted as the page root — DC tools
-       *  push their template-stream here when targeting "the open page". */
-      __dcRootName: () => rootName,
-      /** Editor bridge — the encoded, `data-dc-tpl`-annotated template source.
-       *  The host editor parses this into its own template DOM so it can map a
-       *  rendered node (carrying the same `data-dc-tpl`) back to the source
-       *  node that emitted it. Returns the encoded form (`sc-camel-*` attrs,
-       *  `<sc-raw-*>`/`<sc-helmet>` tags); the editor decodes on serialize. */
-      __dcAnnotatedTemplate: (name) => runtime.annotatedTemplate(name),
-      /** Editor bridge — the *original* (decoded) template source. */
-      __dcTemplateSource: (name) => runtime.templateSource(name),
-      __dcBoot: () => {
-        rootName = boot(runtime, document) ?? rootName;
-        notifyHost();
-      },
-      __dcRegistry: runtime.registry.entries,
-      getDC: (name) => runtime.getDC(name),
-      // `DCLogic` is the documented base class name; `StreamableLogic` is the
-      // implementation alias kept for any project that already references it.
-      DCLogic: runtime.StreamableLogic,
-      StreamableLogic: runtime.StreamableLogic
-    };
-    Object.assign(window, api);
-    window.__dcContentKeyed = true;
-    if (document.readyState !== "loading") api.__dcBoot();
-    else document.addEventListener("DOMContentLoaded", () => api.__dcBoot());
+    const start = () => boot(runtime, document);
+    if (document.readyState !== 'loading') start();
+    else document.addEventListener('DOMContentLoaded', start, { once: true });
   }
   hideRawTemplate();
   loadReactUmd().then(init).catch((err) => {

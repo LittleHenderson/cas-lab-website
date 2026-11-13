@@ -1,0 +1,13 @@
+{
+  "name": "cas-lab-website",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Private CAS Lab security regression candidate",
+  "scripts": {
+    "test": "playwright test --config tests/security/playwright.config.cjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.2",
+    "@playwright/test": "1.56.1"
+  }
+}

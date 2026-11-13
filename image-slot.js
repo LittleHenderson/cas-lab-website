@@ -153,7 +153,114 @@
   // on SVG blobs is inconsistent). GIF is excluded because the canvas
   // re-encode keeps only the first frame, so an animated GIF would silently
   // go still — better to reject than surprise.
-  const ACCEPT = ['image/png', 'image/jpeg', 'image/webp', 'image/avif'];
+  // AVIF is intentionally excluded until its container dimensions can be
+  // checked before decoding. Author-provided src URLs are unaffected.
+  const ACCEPT = ['image/png', 'image/jpeg', 'image/webp'];
+  const MAX_BYTES = 10 * 1024 * 1024;
+  const MAX_INPUT_DIM = 8192;
+  const MAX_PIXELS = 24 * 1024 * 1024;
+  const canEdit = () => typeof window.omelette?.writeFile === 'function';
+
+  function checkDimensions(w, h) {
+    if (!Number.isInteger(w) || !Number.isInteger(h) || w < 1 || h < 1 ||
+        w > MAX_INPUT_DIM || h > MAX_INPUT_DIM || w * h > MAX_PIXELS) {
+      throw new Error('Image dimensions exceed the supported limits.');
+    }
+  }
+
+  // Read bounded bytes, not decoded pixels. A declared MIME alone is not
+  // evidence of an image. Reject malformed/unsupported headers fail-closed.
+  function rasterDimensions(bytes, mime) {
+    const b = bytes;
+    const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+    const tag = (p, s) => p + s.length <= b.length &&
+      Array.from(s).every((c, i) => b[p + i] === c.charCodeAt(0));
+    let w, h;
+    if (mime === 'image/png' && b.length >= 33 &&
+        [137, 80, 78, 71, 13, 10, 26, 10].every((n, i) => b[i] === n) &&
+        v.getUint32(8) === 13 && tag(12, 'IHDR')) {
+      w = v.getUint32(16); h = v.getUint32(20);
+    } else if (mime === 'image/jpeg' && b[0] === 255 && b[1] === 216) {
+      for (let p = 2; p + 3 < b.length;) {
+        if (b[p++] !== 255) break;
+        while (b[p] === 255) p++;
+        const marker = b[p++];
+        if (marker === 217 || marker === 218 || p + 2 > b.length) break;
+        const len = v.getUint16(p);
+        if (len < 2 || p + len > b.length) break;
+        // Baseline and progressive JPEG only; reject uncommon coding modes.
+        if (marker === 192 || marker === 194) {
+          if (len < 8) break;
+          h = v.getUint16(p + 3); w = v.getUint16(p + 5); break;
+        }
+        p += len;
+      }
+    } else if (mime === 'image/webp' && b.length >= 25 &&
+        tag(0, 'RIFF') && tag(8, 'WEBP') && v.getUint32(4, true) + 8 === b.length) {
+      const size = v.getUint32(16, true);
+      if (size + 20 > b.length) throw new Error('Truncated WebP.');
+      if (tag(12, 'VP8X') && size === 10 && !(b[20] & 2)) {
+        w = 1 + b[24] + (b[25] << 8) + (b[26] << 16);
+        h = 1 + b[27] + (b[28] << 8) + (b[29] << 16);
+        checkDimensions(w, h);
+        let frameSeen = false;
+        for (let p = 30; p < b.length;) {
+          if (p + 8 > b.length) throw new Error('Truncated WebP chunk.');
+          const n = v.getUint32(p + 4, true);
+          if (p + 8 + n + (n & 1) > b.length) throw new Error('Truncated WebP payload.');
+          if (tag(p, 'ANIM') || tag(p, 'ANMF') || tag(p, 'VP8X')) {
+            throw new Error('Unsupported WebP structure.');
+          }
+          if (tag(p, 'VP8 ') || tag(p, 'VP8L')) {
+            if (frameSeen) throw new Error('Multiple WebP frames.');
+            // Validate the actual compressed frame too, not just its canvas.
+            const frame = new Uint8Array(20 + n + (n & 1));
+            frame.set(b.subarray(0, 12));
+            new DataView(frame.buffer).setUint32(4, frame.length - 8, true);
+            frame.set(b.subarray(p, p + 8 + n + (n & 1)), 12);
+            const d = rasterDimensions(frame, mime);
+            if (d.w !== w || d.h !== h) throw new Error('Inconsistent WebP dimensions.');
+            frameSeen = true;
+          }
+          p += 8 + n + (n & 1);
+        }
+        if (!frameSeen) throw new Error('Missing WebP frame.');
+      } else if (tag(12, 'VP8 ') && size >= 10 && !(b[20] & 1) &&
+                 b[23] === 157 && b[24] === 1 && b[25] === 42) {
+        w = v.getUint16(26, true) & 16383;
+        h = v.getUint16(28, true) & 16383;
+      } else if (tag(12, 'VP8L') && size >= 5 && b[20] === 47) {
+        const bits = v.getUint32(21, true);
+        if (bits >>> 29) throw new Error('Unsupported WebP version.');
+        w = 1 + (bits & 16383); h = 1 + ((bits >>> 14) & 16383);
+      }
+    }
+    checkDimensions(w, h);
+    return { w, h };
+  }
+
+  const dataUrlCache = new Map();
+  function validDataUrl(url) {
+    if (typeof url !== 'string' || url.length > Math.ceil(MAX_BYTES / 3) * 4 + 32) return false;
+    if (dataUrlCache.has(url)) return dataUrlCache.get(url);
+    let valid = false;
+    try {
+      const m = /^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/]+={0,2})$/.exec(url);
+      if (m && m[2].length % 4 === 0) {
+        const raw = atob(m[2]);
+        if (raw.length && raw.length <= MAX_BYTES) {
+          rasterDimensions(Uint8Array.from(raw, c => c.charCodeAt(0)), m[1]);
+          valid = true;
+        }
+      }
+    } catch {}
+    // Bound retained strings; invalid external values are never cached.
+    if (valid) {
+      if (dataUrlCache.size >= 4) dataUrlCache.delete(dataUrlCache.keys().next().value);
+      dataUrlCache.set(url, true);
+    }
+    return valid;
+  }
 
   // ── Shared sidecar store ────────────────────────────────────────────────
   // One fetch + immediate write-on-change for every <image-slot> on the
@@ -216,13 +323,13 @@
   function flushNow() {
     if (!loaded) return;
     const w = window.omelette && window.omelette.writeFile;
-    if (!w) return;
+    if (!canEdit()) return;
     try { Promise.resolve(w(STATE_FILE, JSON.stringify(slots))).catch(() => {}); } catch (e) {}
   }
   function save() {
     if (saving) { saveDirty = true; return; }
     const w = window.omelette && window.omelette.writeFile;
-    if (!w) return;
+    if (!canEdit()) return;
     saving = true;
     Promise.resolve(w(STATE_FILE, JSON.stringify(slots)))
       .catch(() => {})
@@ -241,7 +348,7 @@
   }
 
   function setSlot(id, val) {
-    if (!id) return;
+    if (!canEdit() || !id) return;
     if (val) { slots[id] = val; tombstones.delete(id); }
     else { delete slots[id]; if (!loaded) tombstones.add(id); }
     subs.forEach((fn) => fn());
@@ -257,8 +364,17 @@
   // (retina) and at MAX_DIM. WebP keeps alpha and is ~10× smaller than PNG
   // for photos, so there's no need for per-image format picking.
   async function toDataUrl(file, targetW) {
+    if (!canEdit() || !file || !ACCEPT.includes(file.type) ||
+        !Number.isFinite(file.size) || file.size < 1 || file.size > MAX_BYTES) {
+      throw new Error('Unsupported image or file exceeds 10 MiB.');
+    }
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    if (bytes.length !== file.size) throw new Error('Invalid image length.');
+    rasterDimensions(bytes, file.type);
+    if (!canEdit()) throw new Error('Editing is unavailable.');
     const bitmap = await createImageBitmap(file);
     try {
+      checkDimensions(bitmap.width, bitmap.height);
       const cap = Math.min(MAX_DIM, Math.max(1, Math.round(targetW * 2)) || MAX_DIM);
       const scale = Math.min(1, cap / Math.max(bitmap.width, bitmap.height));
       const w = Math.max(1, Math.round(bitmap.width * scale));
@@ -455,6 +571,7 @@
      *  when no id could be minted (caller strips the id, today's
      *  behavior). */
     static cloneSlot(fromId, isFree) {
+      if (!canEdit()) return null;
       if (typeof fromId !== 'string' || !fromId) return null;
       // Pre-hydration the store can't veto candidates or source the copy
       // — degrade to the strip (today's behavior) rather than mint
@@ -568,14 +685,14 @@
       this._subFn = () => this._render();
       // Shadow-DOM listeners live with the shadow DOM — bound once here so
       // disconnect/reconnect (e.g. React remount) doesn't stack handlers.
-      this._empty.addEventListener('click', () => this._input.click());
+      this._empty.addEventListener('click', () => this.openFilePicker());
       root.addEventListener('click', (e) => {
         const act = e.target && e.target.getAttribute && e.target.getAttribute('data-act');
         if (!act) return;
         // The hidden controls are opacity-0 but still tabbable — without
         // this gate a keyboard user could drive them on a read-only share
         // link (mirrors the dblclick handler's editable gate).
-        if (!this.hasAttribute('data-editable')) return;
+        if (!canEdit()) return;
         if (act === 'replace') {
           this._exitReframe(true);
           // Host-owned picker (Unsplash modal; it also offers local import).
@@ -612,7 +729,7 @@
       // Gated only on editable — any filled slot can be repositioned/scaled,
       // regardless of fit. Share links (no writeFile) stay static.
       this.addEventListener('dblclick', (e) => {
-        if (!this.hasAttribute('data-editable') || !this._reframes()) return;
+        if (!canEdit() || !this._reframes()) return;
         e.preventDefault();
         if (this.hasAttribute('data-reframe')) this._exitReframe(true);
         else this._enterReframe();
@@ -622,7 +739,7 @@
       // other pointerdown on the spill pans. Offsets are frame-% so a
       // reframed slot survives responsive resize / PPTX export.
       this._spill.addEventListener('pointerdown', (e) => {
-        if (e.button !== 0 || !this.hasAttribute('data-reframe')) return;
+        if (!canEdit() || e.button !== 0 || !this.hasAttribute('data-reframe')) return;
         e.preventDefault();
         e.stopPropagation();
         this._spill.setPointerCapture(e.pointerId);
@@ -647,6 +764,7 @@
           const diag0 = Math.hypot(w0, h0);
           const ux = sx * w0 / diag0, uy = sy * h0 / diag0;
           move = (ev) => {
+            if (!canEdit()) return;
             const proj = (ev.clientX - rect.left - ox) * ux +
                          (ev.clientY - rect.top - oy) * uy;
             const s = clampS(s0 * proj / diag0);
@@ -661,6 +779,7 @@
           this.setAttribute('data-panning', '');
           const start = { px: e.clientX, py: e.clientY, x: this._view.x, y: this._view.y };
           move = (ev) => {
+            if (!canEdit()) return;
             this._view.x = start.x + (ev.clientX - start.px) / fw * 100;
             this._view.y = start.y + (ev.clientY - start.py) / fh * 100;
             this._clampView();
@@ -685,7 +804,7 @@
       // Wheel zoom stays available inside reframe mode as a trackpad nicety —
       // zooms toward the cursor (offset' = cursor·(1-k) + offset·k).
       this.addEventListener('wheel', (e) => {
-        if (!this.hasAttribute('data-reframe')) return;
+        if (!canEdit() || !this.hasAttribute('data-reframe')) return;
         e.preventDefault();
         const r = this.getBoundingClientRect();
         const cx = (e.clientX - r.left) / r.width * 100 - 50;
@@ -745,6 +864,7 @@
     }
 
     _enterReframe() {
+      if (!canEdit() || !this._reframes()) return;
       if (this.hasAttribute('data-reframe')) return;
       this.setAttribute('data-reframe', '');
       this._signalReframe(true);
@@ -831,7 +951,10 @@
     }
 
     // Public: host's "Import from computer" calls this to run local browse.
-    openFilePicker() { this._exitReframe(true); this._input.click(); }
+    openFilePicker() {
+      if (!canEdit()) return;
+      this._exitReframe(true); this._input.click();
+    }
 
     // A src write is a newer intent for this slot's content — the host
     // pick path (setImageSlotImage) or an agent edit — so it must win
@@ -855,6 +978,14 @@
     // handleEvent — one listener object for all four drag events keeps the
     // add/remove symmetric and the depth counter correct.
     handleEvent(e) {
+      if (!canEdit()) {
+        // Do not allow a file dropped on a read-only slot to navigate away.
+        if (e.type === 'dragover' || e.type === 'drop') e.preventDefault();
+        if (e.dataTransfer) e.dataTransfer.dropEffect = 'none';
+        this._depth = 0;
+        this.removeAttribute('data-over');
+        return;
+      }
       if (e.type === 'dragenter' || e.type === 'dragover') {
         // Without preventDefault the browser never fires 'drop'.
         e.preventDefault();
@@ -877,9 +1008,10 @@
     }
 
     async _ingest(file) {
+      if (!canEdit()) return;
       this._setError(null);
       if (!file || ACCEPT.indexOf(file.type) < 0) {
-        this._setError('Drop a PNG, JPEG, WebP, or AVIF image.');
+        this._setError('Drop a PNG, JPEG, or non-animated WebP image (up to 10 MiB).');
         return;
       }
       // toDataUrl can take hundreds of ms on a large photo. A Clear or a
@@ -902,6 +1034,11 @@
         const w = this.clientWidth || this.offsetWidth || MAX_DIM;
         const url = await toDataUrl(file, w);
         if (gen !== this._gen) return;
+        if (!canEdit()) {
+          this._swapGen = 0;
+          this._releaseMask();
+          return;
+        }
         // Only exit reframe once the new image is in hand — a rejected type
         // or decode failure leaves the in-progress crop untouched.
         this._exitReframe(false);
@@ -1057,6 +1194,7 @@
     }
 
     _commitView() {
+      if (!canEdit()) return;
       const v = { s: this._view.s, x: this._view.x, y: this._view.y };
       if (this._userUrl) v.u = this._userUrl;
       // Framing-only (no u) persists too so an author-src slot remembers its
@@ -1085,16 +1223,17 @@
       this._ring.style.display = mask ? 'none' : '';
 
       // Controls and reframe entry gate on this so share links stay read-only.
-      const editable = !!(window.omelette && window.omelette.writeFile);
+      const editable = canEdit();
       this.toggleAttribute('data-editable', editable);
       this._sub.style.display = editable ? '' : 'none';
 
       // Content. The sidecar is also writable by the agent's write_file
-      // tool, so its value isn't guaranteed canvas-originated — only accept
-      // data:image/ URLs from it. The `src` attribute is author-controlled
+      // tool, so its value isn't guaranteed canvas-originated - require a
+      // bounded base64 raster with matching MIME and safe header dimensions.
+      // The `src` attribute is author-controlled
       // (Claude wrote it into the HTML) so it passes through unchanged.
       let stored = this.id ? getSlot(this.id) : this._local;
-      if (stored && stored.u && !/^data:image\//i.test(stored.u)) stored = null;
+      if (stored && stored.u && !validDataUrl(stored.u)) stored = null;
       const srcAttr = this.getAttribute('src') || '';
       this._userUrl = (stored && stored.u) || null;
       const url = this._userUrl || srcAttr;
