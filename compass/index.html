@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="CAS Compass — CAS Lab's evaluation, interpretability, and governed CAS Harness model-audit portal.">
+  <meta name="theme-color" content="#050b0a">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>CAS Compass — CAS Lab</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23050b0a'/%3E%3Cpath d='M32 8L58 54H6Z' fill='none' stroke='%23eaf3ee' stroke-width='3.5'/%3E%3Ccircle cx='32' cy='38' r='6' fill='%2337f5a0'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./compass.css">
+  <script type="module" src="./compass.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="caslab-bar">
+    <div class="caslab-bar-inner">
+      <a href="../index.html#research">← CAS Lab</a>
+      <span class="caslab-bar-label">CAS Compass · CAS Lab portal</span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="header-row">
+      <a class="brand-lockup" href="#overview" aria-label="CAS Compass, CAS Lab portal">
+        <svg class="brand-svg" aria-hidden="true" viewBox="0 0 64 64">
+          <path class="brand-triangle" d="M32 5L61 57H3Z"></path>
+          <svg class="brand-brain-wrap" x="20.5" y="25" width="23" height="27.2" viewBox="0 0 44 52">
+            <g class="cas-breathe">
+              <path d="M20 4C9 4 3 14 3 26C3 38 9 48 20 48Z"></path>
+              <path d="M24 4C35 4 41 14 41 26C41 38 35 48 24 48Z"></path>
+              <path d="M20 14C14 12 12 17 7 15"></path>
+              <path d="M20 25C15 22 11 28 4 25"></path>
+              <path d="M20 36C15 34 12 39 7 37"></path>
+              <path d="M24 14C30 12 32 17 37 15"></path>
+              <path d="M24 25C29 22 33 28 40 25"></path>
+              <path d="M24 36C29 34 32 39 37 37"></path>
+            </g>
+          </svg>
+        </svg>
+        <span class="brand-wordmark">CAS <span class="brand-pill">Compass</span></span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="Primary">
+        <a href="#overview">Overview</a>
+        <a href="#workbench">Workbench</a>
+        <a href="#audit-cockpit">Audit &amp; Cockpit</a>
+        <a href="#honesty-scope">Honesty &amp; Scope</a>
+        <a href="../compiler/index.html">CAS Compiler</a>
+      </nav>
+
+      <div class="header-controls">
+        <button id="motion-toggle" class="motion-btn" type="button" aria-pressed="false" aria-label="Pause motion">Pause motion</button>
+        <a class="cta-primary" href="https://compass.caslabai.com/login" target="_blank" rel="noopener noreferrer">Launch CAS Compass ↗</a>
+        <details class="mobile-nav">
+          <summary>Menu</summary>
+          <nav class="mobile-nav-panel" aria-label="Primary">
+            <a href="#overview">Overview</a>
+            <a href="#workbench">Workbench</a>
+            <a href="#audit-cockpit">Audit &amp; Cockpit</a>
+            <a href="#interpretability">Interpretability &amp; Validation</a>
+            <a href="#honesty-scope">Honesty &amp; Scope</a>
+            <a href="../compiler/index.html">CAS Compiler</a>
+            <a class="mobile-cta" href="https://compass.caslabai.com/login" target="_blank" rel="noopener noreferrer">Launch CAS Compass ↗</a>
+          </nav>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" id="overview" aria-labelledby="hero-title">
+      <div>
+        <p class="eyebrow">CAS LAB · EVALUATION &amp; INTERPRETABILITY PORTAL</p>
+        <h1 id="hero-title">CAS Compass</h1>
+        <p class="hero-lead">
+          CAS Lab's web portal for cognitive architecture assessment, 238 structured evaluation scenarios, multi-model benchmarking and reproducibility checks, blind human validation and calibration, Idea Atlas and 3D mechanistic interpretability, predictive risk forecasting, and governed CAS Harness model audits with tamper-evident Evidence Packets.
+        </p>
+
+        <div class="stage-row" aria-label="Development stage">
+          <span class="stage-badge"><span class="stage-glyph" aria-hidden="true">◐</span> Prototype <span class="stage-scope">· Workbench</span></span>
+          <span class="stage-badge"><span class="stage-glyph" aria-hidden="true">◕</span> Under evaluation <span class="stage-scope">· CAS Harness Audit</span></span>
+        </div>
+
+        <div class="hero-actions">
+          <a class="cta-primary" href="https://compass.caslabai.com" target="_blank" rel="noopener noreferrer">Open CAS Compass ↗</a>
+          <a class="cta-secondary" href="https://compass.caslabai.com/audit-console" target="_blank" rel="noopener noreferrer">Open Audit Console ↗</a>
+          <a class="cta-subtle" href="../compiler/index.html">Open CAS Compiler</a>
+        </div>
+      </div>
+
+      <dl class="hero-meta" aria-label="Portal summary">
+        <div class="hero-meta-row">
+          <dt>Web app</dt>
+          <dd class="mono-val">compass.caslabai.com</dd>
+        </div>
+        <div class="hero-meta-row">
+          <dt>Workbench</dt>
+          <dd>◐ Prototype</dd>
+        </div>
+        <div class="hero-meta-row">
+          <dt>CAS Harness</dt>
+          <dd>◕ Under evaluation</dd>
+        </div>
+        <div class="hero-meta-row">
+          <dt>Production status</dt>
+          <dd class="status-open">OPEN</dd>
+        </div>
+        <div class="hero-meta-row">
+          <dt>Companion tool</dt>
+          <dd>CAS Compiler (runs locally here)</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- 01. Assessment & Benchmarks -->
+    <section class="directory-section" id="workbench" aria-labelledby="workbench-title">
+      <div class="section-header">
+        <p class="eyebrow">01 / ASSESSMENT &amp; BENCHMARKS</p>
+        <h2 id="workbench-title">Evaluation Workbench</h2>
+        <p class="section-desc">Run structured cognitive-architecture probes, compare models across providers, and inspect reproducibility and historical runs.</p>
+      </div>
+
+      <div class="card-grid">
+        <a class="portal-card" href="https://compass.caslabai.com/scenarios" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/scenarios</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Scenarios (238 prompts)</h3>
+          <p>Browse and filter the 238 evaluation scenarios spanning reasoning, alignment stress tests, and cognitive architecture probes.</p>
+          <span class="card-action">Open /scenarios ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/assessment" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/assessment</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Assessment &amp; Multi-Provider Benchmark</h3>
+          <p>Execute single-model assessments or multi-provider benchmark sweeps under explicit dial settings and inspect per-dimension scores.</p>
+          <span class="card-action">Open /assessment ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/ai-challenges" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/ai-challenges</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>7 AI Challenges</h3>
+          <p>Targeted evaluation suites probing seven recurring failure classes in contemporary AI systems with inspectable scoring criteria.</p>
+          <span class="card-action">Open /ai-challenges ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/cohort" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/cohort</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Cohort Comparison</h3>
+          <p>Compare groups of models or configurations side by side to spot systematic divergence across domains and scenario families.</p>
+          <span class="card-action">Open /cohort ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/reproducibility" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/reproducibility</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Reproducibility</h3>
+          <p>Measure run-to-run variance and score stability across repeated trials so unstable results are surfaced rather than hidden.</p>
+          <span class="card-action">Open /reproducibility ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/config" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/config</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Dial Config</h3>
+          <p>Configure evaluation weights, thresholds, and runtime parameters explicitly before launching a benchmark or assessment run.</p>
+          <span class="card-action">Open /config ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/history" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/history</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>History</h3>
+          <p>Review previously saved runs, compare changes over time, and reopen earlier records with their original settings intact.</p>
+          <span class="card-action">Open /history ↗</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 02. CAS Harness Model Audit & 3D Cockpit -->
+    <section class="directory-section" id="audit-cockpit" aria-labelledby="audit-title">
+      <div class="section-header">
+        <p class="eyebrow">02 / CAS HARNESS MODEL AUDIT &amp; 3D COCKPIT</p>
+        <h2 id="audit-title">Governed Model Audits &amp; Inspection</h2>
+        <p class="section-desc">Configure target models, run governed CAS Harness audits with tamper-evident WORM Evidence Packets, and inspect internal structure in the 3D cockpit.</p>
+      </div>
+
+      <div class="card-grid">
+        <a class="portal-card" href="https://compass.caslabai.com/model-config" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/model-config</span>
+            <span class="card-tag">◕ Under evaluation</span>
+          </span>
+          <h3>Model Selection</h3>
+          <p>Select target models, providers, and declared audit parameters before submitting a run to the CAS Harness pipeline.</p>
+          <span class="card-action">Open /model-config ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/audit-console" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/audit-console</span>
+            <span class="card-tag">◕ Under evaluation</span>
+          </span>
+          <h3>Audit Console &amp; WORM Evidence Packets</h3>
+          <p>Inspect governed CAS Harness verdicts, contract checks, human-review flags, and tamper-evident write-once Evidence Packets.</p>
+          <span class="card-action">Open /audit-console ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/cockpit" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/cockpit</span>
+            <span class="card-tag">◕ Under evaluation</span>
+          </span>
+          <h3>3D Mechanistic Interpretability Cockpit</h3>
+          <p>Explore interactive 3D diagnostic views of model activation structure, trace pathways, and audit-linked inspection signals.</p>
+          <span class="card-action">Open /cockpit ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/login" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/login</span>
+            <span class="card-tag">Account</span>
+          </span>
+          <h3>Account Access</h3>
+          <p>Sign in to CAS Compass to manage saved workspaces, audit runs, and authenticated model-provider sessions.</p>
+          <span class="card-action">Open /login ↗</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 03. Interpretability, Forecasting & Validation -->
+    <section class="directory-section" id="interpretability" aria-labelledby="interpretability-title">
+      <div class="section-header">
+        <p class="eyebrow">03 / INTERPRETABILITY, FORECASTING &amp; VALIDATION</p>
+        <h2 id="interpretability-title">Atlas, Forecasting &amp; Human Calibration</h2>
+        <p class="section-desc">Map cognitive architecture traces, inspect risk projections, examine multi-modal signatures, and benchmark automated scores against blind human judgment.</p>
+      </div>
+
+      <div class="card-grid">
+        <a class="portal-card" href="https://compass.caslabai.com/idea-atlas" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/idea-atlas</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Idea Atlas, 3D SGGS &amp; CAS Brain Map</h3>
+          <p>Navigate structured Idea Atlas traces alongside 3D SGGS geometry and CAS Brain Map overlays for visual inspection.</p>
+          <span class="card-action">Open /idea-atlas ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/forecast" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/forecast</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Predictive Risk Forecast</h3>
+          <p>Explore declared-assumption risk projections and sensitivity analyses derived from observed benchmark and audit telemetry.</p>
+          <span class="card-action">Open /forecast ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/visualization" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/visualization</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Multi-Modal Cognitive Signature</h3>
+          <p>Inspect radial cognitive signature displays paired with optional audio sonification for comparative pattern review.</p>
+          <span class="card-action">Open /visualization ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/validate" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/validate</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Blind Human Validation &amp; Calibration</h3>
+          <p>Contribute blind human ratings to calibrate automated evaluators and measure agreement without revealing model identity.</p>
+          <span class="card-action">Open /validate ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/validation/leaderboard" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/validation/leaderboard</span>
+            <span class="card-tag">◐ Prototype</span>
+          </span>
+          <h3>Validation Leaderboard</h3>
+          <p>Review aggregated human-validation calibration metrics and comparative standings across evaluated runs.</p>
+          <span class="card-action">Open /validation/leaderboard ↗</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- 04. Guides, Support & Companion Tool -->
+    <section class="directory-section" id="guides" aria-labelledby="guides-title">
+      <div class="section-header">
+        <p class="eyebrow">04 / GUIDES, SUPPORT &amp; COMPANION TOOL</p>
+        <h2 id="guides-title">Documentation &amp; Local CAS Compiler</h2>
+        <p class="section-desc">Learn how CAS Compass works, check frequently asked questions, or open CAS Lab's browser-native CAS Compiler without leaving this site.</p>
+      </div>
+
+      <div class="card-grid">
+        <a class="portal-card" href="https://compass.caslabai.com/tutorial" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/tutorial</span>
+            <span class="card-tag">Guide</span>
+          </span>
+          <h3>Start Here Tutorial</h3>
+          <p>Step-by-step walkthrough covering your first scenario selection, benchmark run, and how to read returned outputs.</p>
+          <span class="card-action">Open /tutorial ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/how-it-works" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/how-it-works</span>
+            <span class="card-tag">Guide</span>
+          </span>
+          <h3>How It Works</h3>
+          <p>Plain-language overview of the scoring dimensions, CAS Harness evidence contracts, and methodological limits.</p>
+          <span class="card-action">Open /how-it-works ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/faq" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/faq</span>
+            <span class="card-tag">Reference</span>
+          </span>
+          <h3>FAQ</h3>
+          <p>Direct answers on scoring interpretation, evidence artifacts, data handling, and what audit outputs do and do not prove.</p>
+          <span class="card-action">Open /faq ↗</span>
+        </a>
+
+        <a class="portal-card" href="https://compass.caslabai.com/support" target="_blank" rel="noopener noreferrer">
+          <span class="card-top">
+            <span class="card-route">/support</span>
+            <span class="card-tag">Support</span>
+          </span>
+          <h3>Support &amp; Legal</h3>
+          <p>Contact pathways, issue reporting, and legal notices for users operating the CAS Compass web portal.</p>
+          <span class="card-action">Open /support ↗</span>
+        </a>
+
+        <a class="portal-card portal-card--companion" href="../compiler/index.html">
+          <span class="card-top">
+            <span class="card-route">caslabai.com/compiler</span>
+            <span class="card-tag card-tag--local">Runs on your device</span>
+          </span>
+          <h3>CAS Compiler</h3>
+          <p>CAS Lab's free browser-native CAS and CCDL compiler lives right here on CAS Lab—not duplicated inside CAS Compass. No account or API key required.</p>
+          <span class="card-action">Open CAS Compiler →</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Honest Boundaries & Claim-Status Section -->
+    <section class="honesty-section" id="honesty-scope" aria-labelledby="honesty-title">
+      <div class="honesty-box">
+        <p class="eyebrow">HONEST BOUNDARIES &amp; CLAIM STATUS</p>
+        <h2 id="honesty-title">What CAS Compass does—and does not—establish.</h2>
+        <p class="honesty-status-banner">Customer-production status: OPEN.</p>
+
+        <ul class="honesty-grid">
+          <li>
+            <strong>Research vs. production verdicts</strong>
+            Research verdicts do not establish customer-production <code>ACCEPT</code>. Software checks and prototype runs remain bounded to their declared criteria and fixtures.
+          </li>
+          <li>
+            <strong>Human decision requirement</strong>
+            <code>FLAG_FOR_HUMAN_REVIEW</code> requires a qualified human decision. Automated scores and harness outputs never substitute for accountable human sign-off.
+          </li>
+          <li>
+            <strong>Strict evidence presence</strong>
+            Evidence is <code>present</code> only when a named artifact passes its contract; otherwise it is reported as <code>unavailable</code>.
+          </li>
+          <li>
+            <strong>No certification or legal advice</strong>
+            No compliance certification, legal advice, or universal safety conclusion is asserted by any score, forecast, diagram, or Evidence Packet.
+          </li>
+          <li>
+            <strong>Zero analytics on CAS Lab pages</strong>
+            This portal page adds zero analytics, tracking scripts, or third-party telemetry. Google Fonts serves the typefaces; external links open CAS Compass in a new tab.
+          </li>
+        </ul>
+
+        <p class="consolidation-note">
+          <strong>Consolidation notice:</strong> <em>Noetic Compass</em> has been consolidated into <strong>CAS Compass</strong> inside CAS Lab. Visitors navigating to <code>cascompass.ai</code> are forwarded to <code>compass.caslabai.com</code>, while the browser-native CAS Compiler remains hosted directly on CAS Lab at <a href="../compiler/index.html">CAS Compiler</a>.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <p class="footer-credit"><a href="../index.html">CAS Compass is a CAS Lab product</a></p>
+        <p class="footer-sub">Cognitive Architecture System · Evaluation, interpretability, and governed model-audit portal.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="../index.html#research">Research</a>
+        <a href="../compiler/index.html">CAS Compiler</a>
+        <a href="../blog/index.html">Journal</a>
+        <a href="../index.html#contact">Contact</a>
+      </nav>
+      <p class="footer-privacy">CAS Lab pages carry zero analytics. External portal links open <code>compass.caslabai.com</code> in a new tab.</p>
+    </div>
+  </footer>
+</body>
+</html>

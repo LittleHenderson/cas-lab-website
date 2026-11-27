@@ -1,0 +1,844 @@
+/* CAS Compass — CAS Lab Biolume Portal Stylesheet
+ * Zero-build static CSS matching CAS Lab's exact visual tokens and epistemic grammar.
+ */
+:root {
+  --ground: #050b0a;
+  --card: #0c1513;
+  --stripe: #13201c;
+  --rule2: #17231f;
+  --rule: #20302b;
+  --dash: #62706a;
+  --muted: #86958d;
+  --body: #b3c2ba;
+  --text: #eaf3ee;
+  --accent: #37f5a0;
+  --radius: 2px;
+  --brand-mark-size: clamp(40px, 4.6vw, 48px);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--ground);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ground);
+  color: var(--text);
+  font: 400 16px/1.6 'Geist', ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  overflow-x: clip;
+}
+
+/* Subtle drifting 10-dot ambient field matching CAS Lab Compiler */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  inset: -440px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::before {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22200%22%20height%3D%22280%22%3E%3Cg%20fill%3D%22%2337f5a0%22%20fill-opacity%3D%220.04%22%3E%3Ccircle%20cx%3D%22143.0%22%20cy%3D%22162.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22121.1%22%20cy%3D%22175.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22164.9%22%20cy%3D%22175.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22143.0%22%20cy%3D%22190.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22121.1%22%20cy%3D%22205.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22164.9%22%20cy%3D%22205.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22143.0%22%20cy%3D%22220.3%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22121.1%22%20cy%3D%22234.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22164.9%22%20cy%3D%22234.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%22143.0%22%20cy%3D%22247.3%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2248.0%22%20cy%3D%2222.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2226.1%22%20cy%3D%2235.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2269.9%22%20cy%3D%2235.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2248.0%22%20cy%3D%2250.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2226.1%22%20cy%3D%2265.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2269.9%22%20cy%3D%2265.9%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2248.0%22%20cy%3D%2280.3%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2226.1%22%20cy%3D%2294.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2269.9%22%20cy%3D%2294.7%22%20r%3D%2210.8%22%2F%3E%3Ccircle%20cx%3D%2248.0%22%20cy%3D%22107.3%22%20r%3D%2210.8%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  background-size: 200px 280px;
+  animation: caslab-drift-far 90s linear infinite;
+}
+
+body::after {
+  background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22320%22%20height%3D%22440%22%3E%3Cg%20fill%3D%22%2337f5a0%22%20fill-opacity%3D%220.055%22%3E%3Ccircle%20cx%3D%2280.0%22%20cy%3D%2241.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2243.5%22%20cy%3D%2263.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22116.5%22%20cy%3D%2263.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2280.0%22%20cy%3D%2288.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2243.5%22%20cy%3D%22113.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22116.5%22%20cy%3D%22113.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2280.0%22%20cy%3D%22137.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2243.5%22%20cy%3D%22161.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22116.5%22%20cy%3D%22161.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%2280.0%22%20cy%3D%22182.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22240.0%22%20cy%3D%22261.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22203.5%22%20cy%3D%22283.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22276.5%22%20cy%3D%22283.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22240.0%22%20cy%3D%22308.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22203.5%22%20cy%3D%22333.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22276.5%22%20cy%3D%22333.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22240.0%22%20cy%3D%22357.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22203.5%22%20cy%3D%22381.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22276.5%22%20cy%3D%22381.0%22%20r%3D%2218%22%2F%3E%3Ccircle%20cx%3D%22240.0%22%20cy%3D%22402.0%22%20r%3D%2218%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+  background-size: 320px 440px;
+  animation: caslab-drift-near 50s ease-in-out infinite alternate;
+}
+
+@keyframes caslab-drift-far {
+  to { transform: translate(200px, 280px); }
+}
+
+@keyframes caslab-drift-near {
+  to { transform: translate(-160px, 110px); }
+}
+
+@keyframes casBreathe {
+  0%, 100% {
+    filter: drop-shadow(0 0 0.5px var(--accent));
+    opacity: 0.8;
+  }
+  50% {
+    filter: drop-shadow(0 0 5px var(--accent)) drop-shadow(0 0 11px var(--accent));
+    opacity: 1;
+  }
+}
+
+html[data-motion-paused="true"] {
+  scroll-behavior: auto;
+}
+
+html[data-motion-paused="true"] *,
+html[data-motion-paused="true"] *::before,
+html[data-motion-paused="true"] *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 0.2em;
+}
+
+a:hover {
+  color: var(--text);
+}
+
+code {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 12px 18px;
+  background: var(--accent);
+  color: var(--ground);
+  font: 500 15px 'Geist', sans-serif;
+  text-decoration: none;
+  border-radius: var(--radius);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* Row 1: CAS Lab back-bar */
+.caslab-bar {
+  background: #000;
+  border-bottom: 1px solid var(--rule);
+  font: 500 12px/1.4 'Geist Mono', ui-monospace, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.caslab-bar-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 2px clamp(20px, 4vw, 40px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.caslab-bar a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.caslab-bar a:hover {
+  color: var(--accent);
+}
+
+/* Row 2: Sticky CAS Compass Header */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #000;
+  border-bottom: 1px solid var(--text);
+}
+
+.header-row {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 10px clamp(20px, 4vw, 40px);
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--brand-mark-size) * 0.28);
+  flex: none;
+  text-decoration: none;
+  color: var(--text);
+  min-height: 44px;
+}
+
+.brand-lockup:hover {
+  color: var(--text);
+}
+
+.brand-svg {
+  width: var(--brand-mark-size);
+  height: var(--brand-mark-size);
+  flex: none;
+  display: block;
+  overflow: visible;
+}
+
+.brand-triangle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3.4;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 10;
+}
+
+.brand-brain-wrap {
+  overflow: visible;
+}
+
+.cas-breathe {
+  animation: casBreathe 5s ease-in-out infinite;
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-wordmark {
+  font: 700 calc(var(--brand-mark-size) * 0.44)/1 'Unbounded', 'Space Grotesk', sans-serif;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+
+.brand-pill {
+  background: #8b9096;
+  color: #050b0a;
+  padding: 0.18em 0.36em 0.16em;
+  margin-left: 0.14em;
+  border-radius: var(--radius);
+  font-family: 'Space Grotesk', 'Geist', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.desktop-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--text);
+  text-decoration: none;
+  font: 400 15px 'Geist', sans-serif;
+  white-space: nowrap;
+}
+
+.desktop-nav a:hover {
+  color: var(--accent);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: none;
+}
+
+.motion-btn {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--body);
+  font: 400 13px 'Geist', sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.motion-btn:hover {
+  border-color: var(--text);
+  color: var(--text);
+}
+
+.motion-btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 18px;
+  background: var(--accent);
+  color: var(--ground);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font: 600 15px 'Geist', sans-serif;
+  white-space: nowrap;
+}
+
+.cta-primary:hover {
+  background: var(--text);
+  border-color: var(--text);
+  color: var(--ground);
+}
+
+.cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 22px;
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--text);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font: 500 15px 'Geist', sans-serif;
+  white-space: nowrap;
+}
+
+.cta-secondary:hover {
+  background: var(--text);
+  color: var(--ground);
+}
+
+.cta-subtle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 22px;
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  text-decoration: none;
+  font: 500 15px 'Geist', sans-serif;
+  white-space: nowrap;
+}
+
+.cta-subtle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mobile-nav {
+  display: none;
+  flex: none;
+}
+
+.mobile-nav summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid var(--text);
+  border-radius: var(--radius);
+  color: var(--text);
+  cursor: pointer;
+  font: 500 15px 'Geist', sans-serif;
+  list-style: none;
+}
+
+.mobile-nav summary::-webkit-details-marker {
+  display: none;
+}
+
+.mobile-nav-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  padding: 12px clamp(20px, 4vw, 40px) 24px;
+  background: #000;
+  border-bottom: 1px solid var(--text);
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-nav-panel a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  border-bottom: 1px solid var(--rule);
+  color: var(--text);
+  text-decoration: none;
+  font: 400 17px 'Geist', sans-serif;
+}
+
+.mobile-nav-panel a:hover {
+  color: var(--accent);
+}
+
+.mobile-nav-panel .mobile-cta {
+  justify-content: center;
+  margin-top: 14px;
+  border-bottom: 0;
+  background: var(--accent);
+  color: var(--ground);
+  font-weight: 600;
+  border-radius: var(--radius);
+}
+
+.mobile-nav-panel .mobile-cta:hover {
+  background: var(--text);
+  color: var(--ground);
+}
+
+/* Main container */
+main {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 40px) clamp(56px, 7vw, 96px);
+}
+
+.eyebrow {
+  margin: 0 0 16px;
+  font: 500 12px/1.5 'Geist Mono', ui-monospace, monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Hero */
+.hero {
+  padding: clamp(44px, 6.5vw, 88px) 0 clamp(40px, 5vw, 64px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.85fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: end;
+}
+
+.hero h1 {
+  margin: 0;
+  font: 600 clamp(44px, 6vw, 84px)/0.96 'Space Grotesk', 'Geist', sans-serif;
+  letter-spacing: -0.045em;
+  color: var(--text);
+}
+
+.hero-lead {
+  margin: 24px 0 0;
+  max-width: 660px;
+  font: 400 clamp(17px, 1.35vw, 20px)/1.58 'Geist', sans-serif;
+  color: var(--body);
+}
+
+.stage-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.stage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  font: 500 12px/1.4 'Geist Mono', ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.stage-glyph {
+  font-size: 15px;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.stage-scope {
+  color: var(--muted);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.hero-actions .cta-primary {
+  min-height: 48px;
+  padding: 0 24px;
+}
+
+.hero-meta {
+  border: 1px solid var(--text);
+  background: var(--card);
+  border-radius: var(--radius);
+}
+
+.hero-meta-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.hero-meta-row:last-child {
+  border-bottom: 0;
+}
+
+.hero-meta dt {
+  font: 500 12px/1.5 'Geist Mono', ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  flex: none;
+}
+
+.hero-meta dd {
+  margin: 0;
+  font: 400 14px/1.5 'Geist', sans-serif;
+  color: var(--text);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.hero-meta dd.mono-val {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 13px;
+}
+
+.status-open {
+  color: var(--accent);
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 13px;
+}
+
+/* Directory sections */
+.directory-section {
+  padding-top: clamp(40px, 5vw, 64px);
+  margin-top: clamp(40px, 5vw, 64px);
+  border-top: 1px solid var(--text);
+  scroll-margin-top: 96px;
+}
+
+.section-header {
+  max-width: 780px;
+  margin-bottom: 28px;
+}
+
+.section-header h2 {
+  margin: 0;
+  font: 600 clamp(26px, 3.2vw, 40px)/1.1 'Space Grotesk', 'Geist', sans-serif;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.section-header p.section-desc {
+  margin: 12px 0 0;
+  font: 400 16px/1.55 'Geist', sans-serif;
+  color: var(--body);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 20px;
+}
+
+.portal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  background: var(--card);
+  border: 1px solid var(--text);
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  min-height: 208px;
+  transition: box-shadow 120ms ease, border-color 120ms ease;
+}
+
+.portal-card:hover,
+.portal-card:focus-visible {
+  box-shadow: 6px 6px 0 var(--accent);
+  color: var(--text);
+}
+
+.portal-card--companion {
+  background: var(--stripe);
+  border-color: var(--accent);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.card-route {
+  font: 500 12px/1.4 'Geist Mono', ui-monospace, monospace;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 7px;
+  border: 1px dashed var(--dash);
+  border-radius: var(--radius);
+  font: 500 11px/1.4 'Geist Mono', ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--body);
+}
+
+.card-tag--local {
+  border-style: solid;
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.portal-card h3 {
+  margin: 4px 0 0;
+  font: 600 22px/1.2 'Space Grotesk', 'Geist', sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.portal-card p {
+  margin: 0;
+  font: 400 15px/1.55 'Geist', sans-serif;
+  color: var(--body);
+}
+
+.card-action {
+  margin-top: auto;
+  padding-top: 8px;
+  font: 500 14px/1.4 'Geist', sans-serif;
+  color: var(--accent);
+}
+
+/* Honest Boundaries & Claim-Status Section */
+.honesty-section {
+  padding-top: clamp(40px, 5vw, 64px);
+  margin-top: clamp(44px, 6vw, 72px);
+  border-top: 1px solid var(--text);
+  scroll-margin-top: 96px;
+}
+
+.honesty-box {
+  padding: clamp(24px, 4vw, 40px);
+  border: 1px dashed var(--text);
+  background: var(--card);
+  border-radius: var(--radius);
+}
+
+.honesty-box h2 {
+  margin: 0 0 12px;
+  font: 600 clamp(24px, 3vw, 34px)/1.15 'Space Grotesk', 'Geist', sans-serif;
+  letter-spacing: -0.025em;
+}
+
+.honesty-status-banner {
+  display: inline-block;
+  margin: 0 0 22px;
+  padding: 8px 12px;
+  background: var(--stripe);
+  border: 1px dashed var(--accent);
+  border-radius: var(--radius);
+  font: 500 13px/1.5 'Geist Mono', ui-monospace, monospace;
+  color: var(--text);
+}
+
+.honesty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 18px 28px;
+  margin: 0;
+  padding: 20px 0 0;
+  border-top: 1px solid var(--rule);
+  list-style: none;
+}
+
+.honesty-grid li {
+  font: 400 15px/1.58 'Geist', sans-serif;
+  color: var(--body);
+}
+
+.honesty-grid strong {
+  display: block;
+  margin-bottom: 4px;
+  font: 500 12px/1.4 'Geist Mono', ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.honesty-grid code {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 0.9em;
+  color: var(--accent);
+  background: var(--rule2);
+  padding: 1px 5px;
+  border-radius: var(--radius);
+}
+
+.consolidation-note {
+  margin: 24px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  font: 400 15px/1.6 'Geist', sans-serif;
+  color: var(--body);
+}
+
+.consolidation-note strong {
+  color: var(--text);
+}
+
+.consolidation-note code {
+  font-family: 'Geist Mono', ui-monospace, monospace;
+  font-size: 0.9em;
+  color: var(--text);
+  background: var(--rule2);
+  padding: 1px 5px;
+  border-radius: var(--radius);
+}
+
+/* Footer */
+.site-footer {
+  border-top: 1px solid var(--text);
+  background: var(--card);
+}
+
+.footer-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 36px clamp(20px, 4vw, 40px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 28px;
+  align-items: start;
+}
+
+.footer-credit {
+  margin: 0 0 8px;
+  font: 600 18px/1.2 'Space Grotesk', 'Geist', sans-serif;
+}
+
+.footer-credit a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer-credit a:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+.footer-sub {
+  margin: 0;
+  font: 400 14px/1.55 'Geist', sans-serif;
+  color: var(--muted);
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+.footer-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  color: var(--text);
+  font: 400 15px 'Geist', sans-serif;
+  text-underline-offset: 4px;
+}
+
+.footer-nav a:hover {
+  color: var(--accent);
+}
+
+.footer-privacy {
+  margin: 0;
+  font: 400 13px/1.6 'Geist', sans-serif;
+  color: var(--muted);
+}
+
+/* Responsive */
+@media (max-width: 1120px) {
+  .desktop-nav {
+    display: none;
+  }
+  .header-controls .cta-primary {
+    display: none;
+  }
+  .mobile-nav {
+    display: block;
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .caslab-bar-label {
+    display: none;
+  }
+  .header-row {
+    min-height: 68px;
+    gap: 12px;
+  }
+  .motion-btn {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+}
