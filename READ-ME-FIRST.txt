@@ -1,7 +1,7 @@
 CAS LAB WEBSITE: READY-TO-UPLOAD FOLDER
 
 Upload everything in this folder to your web host, keeping the folder structure.
-index.html is the home page. The compiler lives in the compiler/ folder.
+index.html is the home page. The compiler lives in the compiler/ folder and the CAS Compass portal lives in the compass/ folder.
 
 Requirements
 - Any static web host (Netlify, Cloudflare Pages, GitHub Pages, Vercel, or ordinary web hosting).
@@ -18,4 +18,5 @@ After it is live, check
 - Home page loads and every menu link works.
 - Research > The HELM Cube shows the 3D cube and the light-mode buttons work.
 - Research > CAS Compiler opens the compiler, and "Check" runs a program.
+- Compass (or Research > CAS Compass) opens compass/index.html, links to https://compass.caslabai.com and ../compiler/index.html work, and the "Pause motion" toggle pauses and resumes animations.
 - Shop shows all pictures.

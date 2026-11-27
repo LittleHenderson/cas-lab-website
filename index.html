@@ -51,7 +51,8 @@ html[data-motion-paused="true"] *,html[data-motion-paused="true"] *::before,html
         <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
           <a href="{{ n.href }}" onClick="{{ n.go }}" aria-current="{{ n.current }}" style="position:relative;display:inline-flex;align-items:center;min-height:44px;color:var(--text);text-decoration:none;font:400 15px 'Geist',sans-serif" style-hover="color:var(--accent)">{{ n.label }}<sc-if value="{{ n.active }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position:absolute;left:0;right:0;bottom:6px;height:2px;background:var(--accent)"></span></sc-if></a>
         </sc-for>
-        <a href="./blog/" style="display:inline-flex;align-items:center;min-height:44px;color:var(--text);text-decoration:none;font:400 15px 'Geist',sans-serif">Blog</a>
+        <a href="./compass/index.html" style="display:inline-flex;align-items:center;min-height:44px;color:var(--text);text-decoration:none;font:400 15px 'Geist',sans-serif" style-hover="color:var(--accent)">Compass</a>
+        <a href="./blog/" style="display:inline-flex;align-items:center;min-height:44px;color:var(--text);text-decoration:none;font:400 15px 'Geist',sans-serif" style-hover="color:var(--accent)">Blog</a>
         <a href="#contact" onClick="{{ goContact }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 18px;background:var(--accent);color:var(--ground);text-decoration:none;font:500 15px 'Geist',sans-serif;border-radius:2px" style-hover="background:var(--text)">Discuss a project</a>
       </nav>
     </sc-if>
@@ -64,6 +65,7 @@ html[data-motion-paused="true"] *,html[data-motion-paused="true"] *::before,html
       <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
         <a href="{{ n.href }}" onClick="{{ n.go }}" aria-current="{{ n.current }}" style="display:flex;align-items:center;min-height:52px;border-bottom:1px solid var(--rule);color:var(--text);text-decoration:none;font:400 18px 'Geist',sans-serif">{{ n.label }}</a>
       </sc-for>
+      <a href="./compass/index.html" style="display:flex;align-items:center;min-height:52px;border-bottom:1px solid var(--rule);color:var(--text);text-decoration:none;font:400 18px 'Geist',sans-serif">Compass</a>
       <a href="./blog/" style="display:flex;align-items:center;min-height:52px;border-bottom:1px solid var(--rule);color:var(--text);text-decoration:none;font:400 18px 'Geist',sans-serif">Blog</a>
       <a href="#contact" onClick="{{ goContact }}" style="display:flex;align-items:center;justify-content:center;min-height:52px;margin-top:16px;background:var(--accent);color:var(--ground);text-decoration:none;font:500 17px 'Geist',sans-serif;border-radius:2px">Discuss a project</a>
     </nav>
@@ -342,7 +344,6 @@ html[data-motion-paused="true"] *,html[data-motion-paused="true"] *::before,html
     <ul style="margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px">
       <li style="padding:8px 12px;border:1px solid var(--rule);background:var(--card);font:400 14px 'Geist Mono',monospace">HELM-Q1</li>
       <li style="padding:8px 12px;border:1px solid var(--rule);background:var(--card);font:400 14px 'Geist Mono',monospace">CNCM</li>
-      <li style="padding:8px 12px;border:1px solid var(--rule);background:var(--card);font:400 14px 'Geist Mono',monospace">Noetic Compass</li>
     </ul>
   </section>
 </div>
@@ -950,12 +951,13 @@ class Component extends DCLogic {
     const PROJECTS = [
       { id: 'helm', name: 'HELM', stage: 'prototype', summary: 'Central to the lab\'s research direction. ' + pending, access: 'None yet' },
       { id: 'compiler', name: 'CAS Compiler', stage: 'prototype', summary: 'A free browser workspace that runs the actual CAS compiler on your device. Write CAS notation, check it, and inspect the result as cube diagrams, maps and structured data.', access: 'Free, in the browser', url: './compiler/index.html', urlLabel: 'Open the compiler' },
+      { id: 'compass', name: 'CAS Compass', stage: 'prototype', summary: 'CAS Lab\'s evaluation, model-audit, and interpretability portal. Run cognitive architecture assessments, multi-model benchmarks, Idea Atlas traces, 3D cockpit inspections, and governed CAS Harness audits.', access: 'Web portal (compass.caslabai.com)', url: './compass/index.html', urlLabel: 'Open CAS Compass' },
       { id: 'helmcube', name: 'The HELM Cube', stage: 'planned', summary: 'A concept for HELM\'s final home: a small black cube with no buttons that listens, talks, sees and maps its room.', access: 'Concept only, not built' },
-      { id: 'harness', name: 'CAS Harness', stage: 'eval', summary: 'Part of the CAS project family. ' + pending, access: 'None yet' },
+      { id: 'harness', name: 'CAS Harness', stage: 'eval', summary: 'CAS Lab\'s governed model-audit and tamper-evident evidence engine surfaced inside CAS Compass. Under evaluation; customer-production status remains open.', access: 'Via CAS Compass (compass.caslabai.com/audit-console)', url: './compass/index.html#audit-cockpit', urlLabel: 'Open Audit & Cockpit' },
       { id: 'lantern', name: 'Lantern', stage: 'planned', summary: pending, access: 'None yet' },
       { id: 'branchspace', name: 'Branchspace', stage: 'prototype', summary: 'The lab\'s internal workspace for organizing projects, files and ideas. It is not a public product.', access: 'Internal only' }
-    ].map(p => Object.assign(p, { href: p.url || '#project/' + p.id, hasUrl: !!p.url, glyph: st(p.stage).glyph, stageLabel: st(p.stage).label, open: p.id === 'compiler' ? ((e) => { if (e && e.preventDefault) e.preventDefault(); window.location.href = p.url; }) : this.go('project', { sel: p.id }) }));
-    const proj = PROJECTS.find(p => p.id === s.sel && p.id !== 'compiler') || PROJECTS[0];
+    ].map(p => Object.assign(p, { href: (p.id === 'compiler' || p.id === 'compass') ? p.url : '#project/' + p.id, hasUrl: !!p.url, glyph: st(p.stage).glyph, stageLabel: st(p.stage).label, open: (p.id === 'compiler' || p.id === 'compass') ? ((e) => { if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0)) return; if (e && e.preventDefault) e.preventDefault(); window.location.href = p.url; }) : this.go('project', { sel: p.id }) }));
+    const proj = PROJECTS.find(p => p.id === s.sel && p.id !== 'compiler' && p.id !== 'compass') || PROJECTS[0];
     const OFFERS = [
       { id: 'research', title: 'Bounded AI research and feasibility work', short: 'Find out whether an idea is workable before you commit to building it.', problem: 'You have an idea that depends on AI and you do not know whether it can work, what it would take, or where it would fail.', deliverable: 'A written feasibility report: what was tried, what was observed, what remains uncertain and a recommendation on whether to continue.', scope: 'One question, agreed in writing, with a fixed stopping point. Data access and any spending are approved by you first.', next: 'We talk through the question, what a useful answer looks like and what information you could share.' },
       { id: 'software', title: 'Software prototypes and workflow tools', short: 'A working first version of a tool, small enough to judge quickly.', problem: 'A manual or awkward process is costing your team time, and you want to see whether software could carry part of it.', deliverable: 'A bounded prototype you can try, with notes on what it does, what it does not do and what a fuller version would need.', scope: 'A single workflow or feature. A prototype is not production software and is labeled that way.', next: 'We walk through the process as it works today and pick the smallest piece worth prototyping.' },
